@@ -44,4 +44,11 @@
     <antcall target="jar"/>
   </target>
 
+  <target name="test" depends="jar" description="Run unit tests">
+    <echo>
+      Test 'lxl.Index'.
+    </echo>
+    <java classpath="${target.jar}" classname="lxl.Index"/>
+  </target>
+
 </project>
