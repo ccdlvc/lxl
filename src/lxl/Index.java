@@ -40,7 +40,8 @@ import java.io.PrintStream;
 public class Index 
     extends Object
     implements java.io.Serializable,
-               java.lang.Cloneable
+               java.lang.Cloneable,
+               java.lang.Iterable
 {
     private final static long serialVersionUID = 1;
     /**
@@ -84,6 +85,64 @@ public class Index
             }
         }
     }
+    public static class Iterator
+        extends Object
+        implements java.util.Iterator
+    {
+
+        private final Entry[] list;
+
+        private final int length;
+
+        private int index;
+
+
+        public Iterator(Index index){
+            super();
+            Entry[][] table = index.table;
+            int tableLen = table.length;
+            Entry row[];
+            /*
+             * Count
+             */
+            int length = 0;
+            for (int cc = 0, cz = tableLen, lc, lz; cc < cz; cc++){
+                row = table[cc];
+                if (null != row){
+                    length += row.length;
+                }
+            }
+            /*
+             * Copy
+             */
+            Entry[] list = new Entry[length];
+
+            for (int cc = 0, cz = tableLen, lc = 0, rr, rz; cc < cz; cc++){
+                row = table[cc];
+                if (null != row){
+                    for (rr = 0, rz = row.length; rr < rz; rr++, lc++){
+                        list[lc] = row[rr];
+                    }
+                }
+            }
+            this.list = list;
+            this.length = length;
+        }
+
+        public boolean hasNext(){
+            return (this.index < this.length);
+        }
+        public Object next(){
+            if (this.index < this.length)
+                return this.list[this.index++];
+            else
+                throw new java.util.NoSuchElementException();
+        }
+        public void remove(){
+            throw new UnsupportedOperationException();
+        }
+    }
+
 
     private volatile Entry[][] table;
 
@@ -94,6 +153,22 @@ public class Index
         super();
         this.table = new Entry[size][];
         this.size = size;
+    }
+    public Index(Index copy, int resize){
+        super();
+        this.table = new Entry[resize][];
+        this.size = resize;
+
+        Entry list[], table[][] = copy.table;
+        for (int cc = 0, cz = this.size, lc, lz; cc < cz; cc++){
+            list = table[cc];
+            if (null != list){
+                for (lc = 0, lz = list.length; lc < lz; lc++){
+                    Entry e = list[lc];
+                    this.add(e.key,e.index);
+                }
+            }
+        }
     }
 
 
@@ -198,6 +273,9 @@ public class Index
             else
                 out.println();
         } 
+    }
+    public Iterator iterator(){
+        return new Iterator(this);
     }
 
     public final static void main(String[] test){

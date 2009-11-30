@@ -476,16 +476,14 @@ public interface Sequence<T>
     /**
      * Removes the first occurrence of the given item from the sequence.
      *
-     * @param item
-     * The item to remove.
+     * @param item The item to remove.
      *
-     * @return
-     * The index of the item that was removed, or <tt>-1</tt> if the item
-     * could not be found.
+     * @return The item that was removed, or <tt>null</tt> if not
+     * found.
      *
      * @see #remove(int, int)
      */
-    public int remove(T item);
+    public T remove(Object itemOfT);
 
     /**
      * Removes one or more items from the sequence.
