@@ -459,6 +459,13 @@ public class ArrayList<T>
         else
             return list.length;
     }
+    public int size() {
+        T[] list = this.list;
+        if (null == list)
+            return 0;
+        else
+            return list.length;
+    }
 
     @SuppressWarnings("unchecked")
     public T[] toArray(Class component) {
