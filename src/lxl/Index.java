@@ -274,6 +274,7 @@ public class Index
                 out.println();
         } 
     }
+    @Override
     public Iterator iterator(){
         return new Iterator(this);
     }
