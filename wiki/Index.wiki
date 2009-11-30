@@ -1,3 +1,3 @@
 #summary Index class
 
- The [http://code.google.com/p/lxl/source/browse/trunk/src/lxl/Index.java class] provides a light as possible static hash table.
+ The [http://code.google.com/p/lxl/source/browse/trunk/src/lxl/Index.java Index class] provides a light as possible static hash table.
