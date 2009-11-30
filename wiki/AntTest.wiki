@@ -14,4 +14,4 @@
 {{{
  ant test
 }}}
- to run unit test (Index).
+ to run unit tests on [Index] and [Map].
