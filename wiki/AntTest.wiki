@@ -1,0 +1,17 @@
+#summary Building and running ANT for Test
+#labels Featured
+
+ = Build =
+
+ Run 
+{{{
+ ant
+}}}
+
+ = Test =
+
+ Run
+{{{
+ ant test
+}}}
+ to run unit test (Index).
