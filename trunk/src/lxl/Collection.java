@@ -25,9 +25,8 @@ import java.util.Comparator;
  * @author gbrown
  * @author jdp
  */
-public interface Collection<T> 
-    extends java.lang.Iterable<T> 
-{
+public interface Collection<T> {
+
     /**
      * Removes all elements from the collection.
      */

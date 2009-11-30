@@ -23,12 +23,12 @@ package lxl;
  * @author jdp
  */
 public interface Dictionary<K, V>
-    extends Iterable<K>
 {
 
     public class Utils<K,V>
         extends java.util.HashMap<K,V>
-        implements Dictionary<K,V>
+        implements Dictionary<K,V>,
+                   Iterable<K>
     {
         public Utils(){
             super();

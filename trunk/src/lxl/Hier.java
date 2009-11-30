@@ -35,4 +35,12 @@ public interface Hier
 
     public void dropHierParent();
 
+    public List<Component> getHierChildren(Class<Component> in);
+
+    public void setHierChildren(Class<Component> in, List<Component> next);
+
+    public void dropHierChildren(Class<Component> in);
+
+    public void dropHierChildren();
+
 }

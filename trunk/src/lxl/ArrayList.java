@@ -301,9 +301,9 @@ public class ArrayList<T>
 
         return this.list(1,Integer.MAX_VALUE);
     }
-    public int remove (T item) {
+    public T remove (Object item) {
         T[] list = this.list;
-        int index = IndexOf(list,this.comparator,item);
+        int index = IndexOf(list,this.comparator,(T)item);
         if (0 > index) {
             throw new NoSuchElementException();
         }
@@ -324,11 +324,11 @@ public class ArrayList<T>
             }
             this.list = copy;
 
-            return index;
+            return (T)item;
         }
     }
 
-    private T removeIn (int index) {
+    protected T removeIn (int index) {
         T[] list = this.list;
         if (0 > index) 
             throw new ArrayIndexOutOfBoundsException(String.valueOf(index));
