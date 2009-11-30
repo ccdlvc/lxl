@@ -48,7 +48,11 @@
     <echo>
       Test 'lxl.Index'.
     </echo>
-    <java classpath="${target.jar}" classname="lxl.Index"/>
+    <java classpath="${target.jar}" classname="lxl.Index" fork="true"/>
+    <echo>
+      Test 'lxl.Map'.
+    </echo>
+    <java classpath="${target.jar}" classname="lxl.Map" fork="true"/>
   </target>
 
 </project>

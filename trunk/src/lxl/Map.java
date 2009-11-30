@@ -103,4 +103,26 @@ public class Map<K,V>
     public boolean isEmpty(){
         return (0 == this.getLength());
     }
+
+    public final static void main(String[] test){
+        final String alphabet = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        Map<Character,Integer> map = new Map<Character,Integer>(20);
+        for (int cc = 0; cc < 62; cc++){
+            Character key = new Character(alphabet.charAt(cc));
+            map.put(key,cc);
+        }
+        map.index.distribution(false,System.out);
+        int failure = 0;
+        for (int cc = 0; cc < 62; cc++){
+            Character key = new Character(alphabet.charAt(cc));
+            Integer idx = map.get(key);
+            if (null == idx || -1 == idx){
+                failure++;
+                System.out.println("Test failed for key '"+key+"'.");
+            }
+        }
+        if (0 == failure)
+            System.out.println("Test passed.");
+        System.exit(failure);
+    }
 }
