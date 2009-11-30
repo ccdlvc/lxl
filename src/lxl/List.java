@@ -93,6 +93,8 @@ public interface List<T>
      */
     public int getLength();
 
+    public int size();
+
     /**
      * @see ListListener#comparatorChanged(List, Comparator)
      */
