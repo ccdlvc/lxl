@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="lxl" default="jar">
+
+  <property name="src" value="src"/>
+  <property name="bin" value="bin"/>
+  <property name="dst" value="."/>
+
+  <property name="compiler.source" value="1.5"/>
+  <property name="compiler.target" value="1.5"/>
+  <property name="compiler.debug" value="true"/>
+  <property name="compiler.encoding" value="utf-8"/>
+
+  <property file="build.version"/>
+  <property name="this.version" value="${version.major}.${version.minor}.${version.build}"/>
+
+  <property name="target.jar" value="${dst}/${ant.project.name}-${this.version}.jar"/>
+
+  <uptodate property="target.jar.uptodate" targetfile="${target.jar}">
+    <srcfiles dir="${src}" includes="**/*.java"/>
+  </uptodate>
+
+
+  <target name="jar" depends="compile" unless="target.jar.uptodate" description="Package bin to target jar, clean bin.">
+    <delete file="${target.jar}"/>
+    <jar jarfile="${target.jar}" basedir="${bin}" />
+    <delete dir="${bin}"/>
+  </target>
+
+  <target name="compile" unless="target.jar.uptodate" description="Compile src to bin">
+    <mkdir dir="${bin}"/>
+    <javac srcdir="${src}" destdir="${bin}" debug="${compiler.debug}" encoding="${compiler.encoding}"
+           source="${compiler.source}" target="${compiler.target}" />
+  </target>
+
+  <target name="clean" description="Delete products">
+    <delete dir="${bin}"/>
+    <delete>
+      <fileset dir="." includes="lxl-*.jar"/>
+    </delete>
+    <delete dir="TestMain"/>
+  </target>
+
+  <target name="cleanb" depends="clean" description="Clean build">
+    <antcall target="jar"/>
+  </target>
+
+</project>
