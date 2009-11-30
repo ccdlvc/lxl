@@ -1,0 +1,4 @@
+#summary Map class
+
+
+ The [http://code.google.com/p/lxl/source/browse/trunk/src/lxl/Map.java Map] class demonstrates the use of [http://code.google.com/p/lxl/source/browse/trunk/src/lxl/Index.java Index] over a list to create a hash array.
