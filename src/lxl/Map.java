@@ -48,6 +48,16 @@ public class Map<K,V>
     }
 
 
+    @Override
+    public Map clone(){
+        Map clone = (Map)super.clone();
+        if (null != this.index)
+            clone.index = this.index.clone();
+        return clone;
+    }
+    public Dictionary<K,V> cloneDictionary(){
+        return this.clone();
+    }
     /**
      * Lazy construction or reconstruction
      */
@@ -88,7 +98,7 @@ public class Map<K,V>
         if (-1 != idx){
             V value = super.removeIn(idx);
             if (null != this.index){
-                this.index = new Index(this.index,this.index.size);//[TODO Index.remove]
+                this.index = this.index.drop( (Comparable)key);
             }
             return value;
         }
@@ -103,6 +113,16 @@ public class Map<K,V>
     public boolean isEmpty(){
         return (0 == this.getLength());
     }
+    public java.util.Iterator<K> iteratorKeys(){
+        return (java.util.Iterator<K>)this.index().iterator();
+    }
+    public java.util.Iterator<V> iteratorValues(){
+        return super.iterator();
+    }
+    public Iterable<K> keys(){
+        return (Iterable<K>)this.index().keys();
+    }
+
 
     public final static void main(String[] test){
         final String alphabet = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";

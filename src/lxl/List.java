@@ -58,7 +58,7 @@ public interface List<T>
     public void insert(T item, int index);
 
     /**
-     * Updates the item at the given index.
+     * Updates (or defines) the item at the given index.
      *
      * @param index
      * The index of the item to update.
@@ -100,4 +100,9 @@ public interface List<T>
      */
     public void setComparator(Comparator<T> comparator);
 
+    public Iterable<T> values();
+
+    public List cloneList();
+
+    public boolean isEmpty();
 }

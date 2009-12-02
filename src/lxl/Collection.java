@@ -20,12 +20,13 @@ import java.util.Comparator;
 
 /**
  * Root interface in collection hierarchy. Defines operations common to all
- * co.
  *
  * @author gbrown
  * @author jdp
  */
-public interface Collection<T> {
+public interface Collection<T>
+    extends Cloneable
+{
 
     /**
      * Removes all elements from the collection.

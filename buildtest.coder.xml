@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="test-coder" default="run">
+
+  <echo>
+    Test 'lxl.coder.Main'.
+  </echo>
+  <property name="src" value="coder/test"/>
+  <property name="bin" value="${src}/bin"/>
+  <property name="dst" value="."/>
+
+  <property name="compiler.source" value="1.5"/>
+  <property name="compiler.target" value="1.5"/>
+  <property name="compiler.debug" value="true"/>
+  <property name="compiler.encoding" value="utf-8"/>
+
+  <property file="build.version"/>
+  <property name="this.version" value="${version.major}.${version.minor}.${version.build}"/>
+
+  <property name="source.jar" value="lxl-coder-${this.version}.jar"/>
+
+  <available file="${source.jar}" type="file" property="source.available" />
+
+  <fail unless="source.available" message="Missing '${source.jar}' jar."/>
+
+  <property name="target.jar" value="${dst}/${ant.project.name}-${this.version}.jar"/>
+
+  <echo message="Building ${target.jar} with ${source.jar}"/>
+
+  <path id="source.jar.pack">
+    <pathelement location="${source.jar}"/>
+  </path>
+
+  <uptodate property="target.jar.uptodate" targetfile="${target.jar}">
+    <srcfiles dir="${src}" includes="**/*.java"/>
+    <srcfiles file="${source.jar}"/>
+  </uptodate>
+
+  <target name="run" depends="jar">
+    <echo>
+      Running test
+      java jar ${target.jar}
+                      ${src}/templates/test.Main.xtm
+                      ${src}/odl
+                      ${src}/src
+    </echo>
+
+    <java jar="${target.jar}" fork="true">
+      <arg value="${src}/templates/test.Main.xtm"/>
+      <arg value="${src}/odl"/>
+      <arg value="${src}/src"/>
+    </java>
+
+  </target>
+
+  <target name="jar" depends="compile" unless="target.jar.uptodate" description="Package bin to target jar, clean bin.">
+    <delete file="${target.jar}"/>
+
+    <jar jarfile="${target.jar}">
+      <manifest>
+        <attribute name="Main-Class" value="test.Main"/>
+      </manifest>
+      <fileset dir="${bin}" includes="**/*.class"/>
+      <zipfileset src="${toString:source.jar.pack}"/>
+    </jar>
+
+    <delete dir="${bin}"/>
+  </target>
+
+  <target name="compile" unless="target.jar.uptodate" description="Compile src to bin">
+    <mkdir dir="${bin}"/>
+    <javac srcdir="${src}" destdir="${bin}" 
+           debug="${compiler.debug}" encoding="${compiler.encoding}"
+           source="${compiler.source}" target="${compiler.target}" 
+           classpath="${source.jar}" />
+
+  </target>
+
+  <target name="clean" description="Delete products">
+    <delete dir="${bin}"/>
+    <delete file="${target.jar}"/>
+  </target>
+
+  <target name="cleanb" depends="clean" description="Clean build">
+    <antcall target="jar"/>
+  </target>
+
+</project>

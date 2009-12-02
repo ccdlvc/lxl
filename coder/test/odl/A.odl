@@ -1,0 +1,8 @@
+
+package X;
+
+class A {
+
+  int fieldI;
+
+}
