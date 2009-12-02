@@ -1,0 +1,3 @@
+
+Copied from  http://hg.openjdk.java.net/jdk7/deploy/
+

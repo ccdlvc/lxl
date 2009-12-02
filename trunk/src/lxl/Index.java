@@ -87,7 +87,8 @@ public class Index
     }
     public static class Iterator
         extends Object
-        implements java.util.Iterator
+        implements java.util.Iterator,
+                   Iterable
     {
 
         private final Entry[] list;
@@ -141,6 +142,9 @@ public class Index
         public void remove(){
             throw new UnsupportedOperationException();
         }
+        public java.util.Iterator iterator(){
+            return this;
+        }
     }
 
 
@@ -187,6 +191,73 @@ public class Index
         }
         catch(CloneNotSupportedException exc){
             throw new InternalError(exc.toString());
+        }
+    }
+    private Index clone(int drop){
+        try {
+            Index clone = (Index)super.clone();
+            clone.table = this.table.clone();
+
+            Entry list[], table[][] = clone.table;
+            for (int cc = 0, len = this.size; cc < len; cc++){
+                if (drop != cc){
+                    list = table[cc];
+                    if (null != list)
+                        table[cc] = list.clone();
+                }
+            }
+            return clone;
+        }
+        catch(CloneNotSupportedException exc){
+            throw new InternalError(exc.toString());
+        }
+    }
+    public Index drop(Comparable key){
+        int table = ((null == key)?(0):(Math.abs(key.hashCode())%this.size));
+        Entry[] list = this.table[table];
+        if (null == list)
+            return this;
+        else {
+            Entry entry;
+            scan:
+            for (int cc = 0, len = list.length; cc < len; cc++){
+                entry = list[cc];
+                switch(entry.compareTo(key)){
+                case 0: {
+                    Index clone = this.clone(table);
+                    if (1 == len)
+                        clone.table[table] = null;
+                    else {
+                        int nlen = (len-1);
+                        if (0 == cc){
+                            Entry[] copier = new Entry[nlen];
+                            System.arraycopy(list,1,copier,0,nlen);
+
+                            clone.table[table] = copier;
+                        }
+                        else if (nlen == cc){
+                            Entry[] copier = new Entry[nlen];
+                            System.arraycopy(list,0,copier,0,nlen);
+
+                            clone.table[table] = copier;
+                        }
+                        else {
+                            Entry[] copier = new Entry[nlen];
+                            System.arraycopy(list,0,copier,0,cc);
+                            System.arraycopy(list,(cc+1),copier,cc,(nlen-cc));
+
+                            clone.table[table] = copier;
+                        }
+                    }
+                    return clone;
+                }
+                case -1:
+                    continue scan;
+                default:
+                    return this;
+                }
+            }
+            return this;
         }
     }
     public int get(Comparable key){
@@ -276,6 +347,9 @@ public class Index
     }
     @Override
     public Iterator iterator(){
+        return new Iterator(this);
+    }
+    public Iterable keys(){
         return new Iterator(this);
     }
 

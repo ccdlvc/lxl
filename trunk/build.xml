@@ -1,24 +1,122 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="lxl" default="jar">
+<project name="lxl" default="test">
 
   <property name="src" value="src"/>
+  <property name="lib" value="lib"/>
   <property name="bin" value="bin"/>
   <property name="dst" value="."/>
+
+  <property name="coder.src" value="coder/src"/>
+  <property name="hapax3.src" value="hapax3/src"/>
+  <property name="beans.src" value="beans/src"/>
+  <property name="net.src" value="net/src"/>
 
   <property name="compiler.source" value="1.5"/>
   <property name="compiler.target" value="1.5"/>
   <property name="compiler.debug" value="true"/>
   <property name="compiler.encoding" value="utf-8"/>
 
+
   <property file="build.version"/>
+
   <property name="this.version" value="${version.major}.${version.minor}.${version.build}"/>
 
+
   <property name="target.jar" value="${dst}/${ant.project.name}-${this.version}.jar"/>
+
+  <property name="coder.target.jar" value="${dst}/${ant.project.name}-coder-${this.version}.jar"/>
+  <property name="hapax3.target.jar" value="${dst}/${ant.project.name}-hapax3-${this.version}.jar"/>
+  <property name="net.target.jar" value="${dst}/${ant.project.name}-net-${this.version}.jar"/>
+
+  <path id="lib.javax.jnlp">
+    <fileset dir="net" includes="**/javax-jnlp.jar" />
+  </path>
+
 
   <uptodate property="target.jar.uptodate" targetfile="${target.jar}">
     <srcfiles dir="${src}" includes="**/*.java"/>
   </uptodate>
 
+  <uptodate property="coder.target.jar.uptodate" targetfile="${coder.target.jar}">
+    <srcfiles dir="${coder.src}" includes="**/*.java"/>
+    <srcfiles file="${hapax3.target.jar}"/>
+  </uptodate>
+  <uptodate property="hapax3.target.jar.uptodate" targetfile="${hapax3.target.jar}">
+    <srcfiles dir="${hapax3.src}" includes="**/*.java"/>
+    <srcfiles file="${net.target.jar}"/>
+  </uptodate>
+  <uptodate property="net.target.jar.uptodate" targetfile="${net.target.jar}">
+    <srcfiles dir="${net.src}" includes="**/*.java"/>
+    <srcfiles file="${target.jar}"/>
+    <srcfiles file="${toString:lib.lavax.jnlp}"/>
+  </uptodate>
+
+
+  <target name="coder" depends="hapax3" unless="coder.target.jar.uptodate" description="build 'lxl.jar' and 'lxl-coder.jar'.">
+
+    <mkdir dir="${bin}"/>
+    <javac srcdir="${coder.src}" destdir="${bin}" debug="${compiler.debug}" encoding="${compiler.encoding}"
+           classpath="${hapax3.target.jar}" source="${compiler.source}" target="${compiler.target}" />
+
+    <delete file="${coder.target.jar}"/>
+    <jar jarfile="${coder.target.jar}" basedir="${bin}">
+      <manifest>
+        <attribute name="Main-Class" value="lxl.coder.Main"/>
+      </manifest>
+      <zipfileset src="${hapax3.target.jar}"/>
+    </jar>
+    <delete dir="${bin}"/>
+  </target>
+
+  <target name="hapax3" depends="beans" unless="hapax3.target.jar.uptodate" description="build 'lxl.jar' and 'lxl-hapax3.jar'.">
+
+    <mkdir dir="${bin}"/>
+    <javac srcdir="${hapax3.src}" destdir="${bin}" debug="${compiler.debug}" encoding="${compiler.encoding}"
+           classpath="${beans.target.jar}" source="${compiler.source}" target="${compiler.target}" />
+
+    <delete file="${hapax3.target.jar}"/>
+    <jar jarfile="${hapax3.target.jar}" basedir="${bin}">
+      <zipfileset src="${beans.target.jar}"/>
+    </jar>
+    <delete dir="${bin}"/>
+  </target>
+
+  <target name="beans" depends="net" unless="beans.target.jar.uptodate" description="build 'lxl.jar' and 'lxl-beans.jar'.">
+
+    <property name="beans.target.jar" value="${dst}/${ant.project.name}-beans-${this.version}.jar"/>
+
+    <mkdir dir="${bin}"/>
+    <javac srcdir="${beans.src}" destdir="${bin}" debug="${compiler.debug}" encoding="${compiler.encoding}"
+           classpath="${net.target.jar}" source="${compiler.source}" target="${compiler.target}" />
+
+    <delete file="${beans.target.jar}"/>
+    <jar jarfile="${beans.target.jar}" basedir="${bin}">
+      <zipfileset src="${net.target.jar}"/>
+    </jar>
+    <delete dir="${bin}"/>
+  </target>
+
+  <target name="net" depends="jar" unless="net.target.jar.uptodate" description="build 'lxl.jar' and 'lxl-net.jar'.">
+
+    <path id="net.compiler.classpath">
+      <path refid="lib.javax.jnlp"/>
+      <path location="${target.jar}"/>
+    </path>
+
+    <echo message="lib.javax.jnlp = ${toString:lib.javax.jnlp}"/>
+    <echo message="net.compiler.classpath = ${toString:net.compiler.classpath}"/>
+
+    <mkdir dir="${bin}"/>
+    <javac srcdir="${net.src}" destdir="${bin}" debug="${compiler.debug}" encoding="${compiler.encoding}"
+           classpathref="net.compiler.classpath" source="${compiler.source}" target="${compiler.target}" />
+
+    <delete file="${net.target.jar}"/>
+    <jar jarfile="${net.target.jar}" basedir="${bin}">
+      <zipfileset src="${target.jar}"/>
+      <zipfileset src="${toString:lib.javax.jnlp}"/>
+    </jar>
+    <delete dir="${bin}"/>
+  </target>
 
   <target name="jar" depends="compile" unless="target.jar.uptodate" description="Package bin to target jar, clean bin.">
     <delete file="${target.jar}"/>
@@ -36,6 +134,7 @@
     <delete dir="${bin}"/>
     <delete>
       <fileset dir="." includes="lxl-*.jar"/>
+      <fileset dir="." includes="test-*.jar"/>
     </delete>
     <delete dir="TestMain"/>
   </target>
@@ -44,7 +143,7 @@
     <antcall target="jar"/>
   </target>
 
-  <target name="test" depends="jar" description="Run unit tests">
+  <target name="test" depends="coder" description="Run unit tests">
     <echo>
       Test 'lxl.Index'.
     </echo>
@@ -53,6 +152,12 @@
       Test 'lxl.Map'.
     </echo>
     <java classpath="${target.jar}" classname="lxl.Map" fork="true"/>
+    <echo>
+      And...
+    </echo>
+    <subant>
+      <fileset dir="." includes="**/buildtest.*.xml" />
+    </subant>
   </target>
 
 </project>

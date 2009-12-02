@@ -123,7 +123,7 @@ public class ArrayList<T>
     }
     public static class Iterator<T>
         extends Object
-        implements java.util.Iterator<T>
+        implements Iterable<T>, java.util.Iterator<T>
     {
         private final T[] list;
         private final int length;
@@ -155,6 +155,9 @@ public class ArrayList<T>
         }
         public void remove(){
             throw new UnsupportedOperationException();
+        }
+        public java.util.Iterator<T> iterator(){
+            return this;
         }
     }
 
@@ -229,11 +232,16 @@ public class ArrayList<T>
     public ArrayList clone(){
         try {
             ArrayList clone = (ArrayList)super.clone();
+            if (null != this.list)
+                clone.list = this.list.clone();
             return clone;
         }
         catch (CloneNotSupportedException exc){
             throw new InternalError("Cloneable");
         }
+    }
+    public List cloneList(){
+        return this.clone();
     }
     public int add(T item) {
         int index = -1;
@@ -466,6 +474,20 @@ public class ArrayList<T>
         else
             return list.length;
     }
+    public boolean isEmpty() {
+        T[] list = this.list;
+        if (null == list)
+            return true;
+        else
+            return (0 == list.length);
+    }
+    public boolean isNotEmpty() {
+        T[] list = this.list;
+        if (null == list)
+            return false;
+        else
+            return (0 != list.length);
+    }
 
     @SuppressWarnings("unchecked")
     public T[] toArray(Class component) {
@@ -506,6 +528,10 @@ public class ArrayList<T>
     }
 
     public java.util.Iterator<T> iterator() {
+
+        return new Iterator(this.list);
+    }
+    public Iterable<T> values() {
 
         return new Iterator(this.list);
     }
