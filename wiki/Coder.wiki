@@ -1,0 +1,5 @@
+#summary Hapax3 templater
+
+ [http://code.google.com/p/lxl/source/browse/trunk/coder/src/coder/Main.java Coder Main] uses a [http://code.google.com/p/lxl/source/browse/trunk/hapax3/src/hapax/Template.java Hapax3 Template] from ODL.
+
+ The application target is any bean set that can be described by a template and an ODL schema.
