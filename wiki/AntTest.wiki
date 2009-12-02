@@ -5,6 +5,10 @@
 
  Run 
 {{{
- [http://ant.apache.org/ ant]
+ ant
 }}}
  for unit tests on [Index], [Map] and [Coder].
+
+
+
+ [http://ant.apache.org/  *ant]
