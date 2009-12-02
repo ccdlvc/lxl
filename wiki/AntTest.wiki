@@ -1,17 +1,10 @@
 #summary Building and running ANT for Test
 #labels Featured
 
- = Build =
+ = Build & Test =
 
  Run 
 {{{
  ant
 }}}
-
- = Test =
-
- Run
-{{{
- ant test
-}}}
- to run unit tests on [Index] and [Map].
+ for unit tests on [Index], [Map] and [Coder].
