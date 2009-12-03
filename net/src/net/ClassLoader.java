@@ -45,11 +45,11 @@ public class ClassLoader
 
     protected final static void LoadTestDebug(){
         {
-            String test = System.getProperty("lxl.net.Main.Test");
+            String test = System.getProperty("lxl.net.ClassLoader.Test");
             Test = (null != test && "true".equalsIgnoreCase(test));
         }
         {
-            String debug = System.getProperty("lxl.net.Main.Debug");
+            String debug = System.getProperty("lxl.net.ClassLoader.Debug");
             Debug = (null != debug && "true".equalsIgnoreCase(debug));
         }
     }
