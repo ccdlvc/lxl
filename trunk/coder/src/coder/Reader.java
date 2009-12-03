@@ -35,7 +35,7 @@ import java.util.regex.Pattern;
  * @author jdp
  */
 public final class Reader
-    extends Scanner
+    extends lxl.io.Scanner
 {
 
     private Comment comment;
