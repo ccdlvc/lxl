@@ -153,6 +153,10 @@
     </echo>
     <java classpath="${target.jar}" classname="lxl.Map" fork="true"/>
     <echo>
+      Test 'lxl.Primes'.
+    </echo>
+    <java classpath="${target.jar}" classname="lxl.Primes" fork="true"/>
+    <echo>
       And...
     </echo>
     <subant>
