@@ -155,11 +155,13 @@ public class Index
 
     public Index(int size){
         super();
+        size = Primes.Ceil(size);
         this.table = new Entry[size][];
         this.size = size;
     }
     public Index(Index copy, int resize){
         super();
+        resize = Primes.Ceil(resize);
         this.table = new Entry[resize][];
         this.size = resize;
 
