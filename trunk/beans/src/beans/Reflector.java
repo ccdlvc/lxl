@@ -262,11 +262,11 @@ public class Reflector
     }
 
 
-    private Object bean;
+    protected Object bean;
 
     public final boolean isComponent;
 
-    private Map<String,Relative> relatives;
+    protected Map<String,Relative> relatives;
 
 
     public Reflector(Object bean) {
@@ -335,13 +335,19 @@ public class Reflector
             return rel;
         }
         else if (this.bean instanceof Component){
-            rel = new Relative( (Component)this.bean, name, value);
+            rel = this.newRelative( (Component)this.bean, name, value);
             relatives.put(name,rel);
             return rel;
         }
         else
             return null;
     }
+
+    protected Relative newRelative(Component bean, String name, String value){
+
+        return (new Relative(bean, name, value));
+    }
+
     public void dropRelative(String name){
         Map<String,Relative> relatives = this.relatives;
         if (null != relatives)
