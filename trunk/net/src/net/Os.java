@@ -86,4 +86,16 @@ public final class Os {
             return (os.equals(Name) && arch.equals(Arch));
         }
     }
+    public static boolean Is(String os){
+        switch (THIS){
+        case DARWIN:
+            return (os.equals(Name));
+        case WINDOWS:
+            return (os.startsWith(Os.Windows));
+        case LINUX:
+        case SUNOS:
+        default:
+            return (os.equals(Name));
+        }
+    }
 }

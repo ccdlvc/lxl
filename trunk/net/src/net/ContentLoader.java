@@ -118,7 +118,7 @@ public abstract class ContentLoader
     }
     public boolean overwritein(java.lang.ClassLoader loader) throws IOException {
         URLConnection connection = this.source.openConnection();
-        connection.setRequestProperty("User-Agent","jnlp-loader/1.0");
+        connection.setRequestProperty("User-Agent","lxl.net.ContentLoader/1.0");
         connection.setRequestProperty("Accept","text/xml, application/*, image/*");
         connection.connect();
         long networkLast = connection.getLastModified();
