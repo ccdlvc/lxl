@@ -25,6 +25,8 @@ import lxl.hapax.TemplateException;
 import lxl.hapax.TemplateName;
 import lxl.hapax.TemplateRenderer;
 
+import lxl.io.Find;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
