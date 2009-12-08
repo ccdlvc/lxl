@@ -29,9 +29,17 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.MalformedURLException;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+
+import javax.jnlp.JNLPRandomAccessFile;
 
 /**
  * Disk cache content download and unpack.
@@ -84,10 +92,30 @@ public abstract class ContentLoader
     }
 
 
+    public final URL getSource(){
+        return this.source;
+    }
+    public final String getSourcePath(){
+        return this.sourcePath;
+    }
+    public final boolean isNotLoaded(){
+        return (!this.hasCopy());
+    }
+    public final boolean isLoaded(){
+        return this.hasCopy();
+    }
+    /**
+     * Lazily loaded
+     */
+    public final boolean isLazy(){
+        return this.lazy;
+    }
     public final File init(){
         File targetFile = this.targetFile;
         if (null == targetFile){
+
             targetFile = ClassLoader.GetTempFile(this.sourcePath);
+
             this.targetFile = targetFile;
         }
         return targetFile;
@@ -95,7 +123,9 @@ public abstract class ContentLoader
     public final File target(){
         File targetFile = this.targetFile;
         if (null == targetFile){
+
             targetFile = ClassLoader.GetTempFile(this.sourcePath);
+
             this.targetFile = targetFile;
         }
         return targetFile;
@@ -166,6 +196,93 @@ public abstract class ContentLoader
         finally {
             in.close();
         }
+    }
+    public final InputStream getInputStream() throws IOException {
+        File target = this.target();
+        return new FileInputStream(target);
+    }
+    public final OutputStream getOutputStream(boolean overwrite) throws IOException {
+        File target = this.target();
+        boolean append = (!overwrite);
+        return new FileOutputStream(target,append);
+    }
+    public final FileChannel getChannelRead() throws IOException {
+        File target = this.target();
+        FileInputStream fin = new FileInputStream(target);
+        return fin.getChannel();
+    }
+    public final FileChannel getChannelReadWrite(boolean overwrite) throws IOException {
+        File target = this.target();
+        boolean append = (!overwrite);
+        FileOutputStream fout = new FileOutputStream(target,append);
+        return fout.getChannel();
+    }
+    public final long getLength() throws IOException {
+        File target = this.target();
+        return target.length();
+    }
+    public final boolean canRead() throws IOException {
+        File target = this.target();
+        return target.canRead();
+    }
+    public final boolean canWrite() throws IOException {
+        File target = this.target();
+        return target.canWrite();
+    }
+    public final ByteBuffer copyTo() throws IOException {
+        if (this.hasCopy()){
+            File target = this.target();
+            long llen = target.length();
+            if (Integer.MAX_VALUE < llen)
+                throw new IllegalStateException("Buffer overflow.");
+            else {
+                int len = (int)llen;
+
+                FileChannel readonly = this.getChannelRead();
+                try {
+                    ByteBuffer buffer = ByteBuffer.allocate(len);
+
+                    readonly.read(buffer);
+
+                    return buffer;
+                }
+                finally {
+                    readonly.close();
+                }
+            }
+        }
+        else
+            throw new IllegalStateException("Requires download.");
+    }
+    public final CharBuffer copyTo(Charset cs) throws IOException {
+
+        ByteBuffer bytes = this.copyTo();
+        CharsetDecoder coder = cs.newDecoder();
+        CharBuffer chars = coder.decode(bytes);
+        return chars;
+    }
+    public final JNLPRandomAccessFile getRandomAccessFile(String mode) throws IOException {
+        /* **************************************
+         *                                      *
+         * [TODO] implement for                 *
+         *         mapped file                  *
+         *                                      *
+         ****************************************/
+        throw new UnsupportedOperationException();
+    }
+    public final long getMaxLength() throws IOException {
+        /* **************************************
+         *                                      *
+         * [TODO] implement for RAC             *
+         ****************************************/
+        throw new UnsupportedOperationException();
+    }
+    public final long setMaxLength(long maxlength) throws IOException {
+        /* **************************************
+         *                                      *
+         * [TODO] implement for RAC             *
+         ****************************************/
+        throw new UnsupportedOperationException();
     }
     protected boolean hasCopy(){
         return (this.target().isFile());
