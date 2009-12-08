@@ -29,16 +29,16 @@ public final class Clean
     implements Runnable
 {
 
-    private final lxl.io.Find find;
+    private final lxl.net.Find find;
 
-    public Clean(lxl.io.Find find){
+    public Clean(lxl.net.Find find){
         super();
         this.find = find;
     }
 
     public void run(){
 
-        lxl.io.Find files = this.find;
+        lxl.net.Find files = this.find;
         if (null != files){
             while (files.hasNext()){
                 File next = files.next();

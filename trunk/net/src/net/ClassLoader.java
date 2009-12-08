@@ -225,11 +225,11 @@ public class ClassLoader
             return file;
         }
     }
-    public final lxl.io.Find findTemp(){
-        return new lxl.io.Find(this.temp);
+    public final lxl.net.Find findTemp(){
+        return new Find(true);
     }
-    public final lxl.io.Find findCache(){
-        return new lxl.io.Find(this.cache);
+    public final lxl.net.Find findCache(){
+        return new Find(false);
     }
     public final Clean cleanTemp(){
         return new Clean(this.findTemp());
