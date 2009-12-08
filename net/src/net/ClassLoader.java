@@ -105,7 +105,7 @@ public class ClassLoader
     }
 
 
-    public final File temp, cache;
+    protected volatile File temp, cache;
 
     protected final File alternative;
 
