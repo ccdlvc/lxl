@@ -1,7 +1,10 @@
 package lxl;
 
 /**
- * @see Index
+ * This is used by {@link Index} to guarantee optimal hash table sizes
+ * via the "ceil" function (for a prime equal to or greater than its
+ * argument).
+ * 
  */
 public class Primes
     extends Object
@@ -110,11 +113,21 @@ public class Primes
     public int ceil(int num){
         int idx = this.indexOfFloor(num);
         if (-1 != idx){
-            idx += 1;
-            if (idx < this.list.length)
-                return this.list[idx+1];
+            if (num == this.list[idx])
+                return this.list[idx];
+            else {
+                idx += 1;
+                if (idx < this.list.length)
+                    return this.list[idx+1];
+                else {
+                    /*
+                     * Need larger prime (punt)
+                     */
+                    return this.list[idx-1];
+                }
+            }
         }
-        return -1;
+        return this.list[0];
     }
 
     protected int indexOfFloor(int num){
