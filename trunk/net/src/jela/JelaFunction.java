@@ -29,18 +29,9 @@ package lxl.jela;
  * @author J. Pritchard
  */
 public interface JelaFunction {
-
     /**
-     * Alternative to {@link lxl.jela.JelaBean}
+     * Function parameter
      */
-    public interface BeanOverride
-        extends JelaFunction
-    {
-
-        public Class getBeanClass();
-
-    }
-
     public interface Parameter {
 
         public Class getParameterType();
