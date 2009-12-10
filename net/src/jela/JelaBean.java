@@ -25,7 +25,6 @@ package lxl.jela;
  * 
  * @see JelaProgram
  * @see JelaFunction
- * @see JelaFunction$BeanOverride
  * @author J. Pritchard
  */
 public interface JelaBean {
@@ -33,4 +32,6 @@ public interface JelaBean {
     public Class getBeanClass();
 
     public JelaFunction[] getBeanOverrides();
+
+    public String[] getBeanImports();
 }
