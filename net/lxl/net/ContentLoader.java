@@ -242,8 +242,13 @@ public abstract class ContentLoader
                 try {
                     ByteBuffer buffer = ByteBuffer.allocate(len);
 
-                    readonly.read(buffer);
-
+                    int read, remaining = len;
+                    while (-1 != (read = readonly.read(buffer))){
+                        remaining -= read;
+                        if (0 == remaining)
+                            break;
+                    }
+                    buffer.flip();
                     return buffer;
                 }
                 finally {

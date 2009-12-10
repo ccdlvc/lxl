@@ -41,7 +41,7 @@ public class Template
     private volatile TemplateRenderer renderer;
 
 
-    public Template(java.net.URL source){
+    public Template(URL source){
         super(source);
     }
     public Template(String codebase, String path){
@@ -120,7 +120,7 @@ public class Template
     }
     public boolean hasTemplateSourceHapax(){
         try {
-            return (0 < this.getLength());
+            return (this.download());
         }
         catch (java.io.IOException exc){
             return false;
@@ -128,7 +128,7 @@ public class Template
     }
     public boolean hasNotTemplateSourceHapax(){
         try {
-            return (1 > this.getLength());
+            return (!this.download());
         }
         catch (java.io.IOException exc){
             return true;

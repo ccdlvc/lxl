@@ -77,6 +77,11 @@ public class Main
             top.addBeanList("interfaces",clas.interfaces);
 
             File beanJava = new File(packagePath,parentClassName+".java");
+            File beanJavaDir = beanJava.getParentFile();
+            if (!beanJavaDir.exists()){
+                if (!beanJavaDir.mkdirs())
+                    throw new TemplateException("Unable to create directory containing output '"+beanJavaDir.getPath()+"'.");
+            }
             PrintWriter out = new PrintWriter(new FileWriter(beanJava));
             try {
                 OD.GenerateBeanSource(template, top, out);

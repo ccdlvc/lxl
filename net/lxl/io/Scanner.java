@@ -46,6 +46,8 @@ public class Scanner
 {
     public final static Charset UTF8 = Charset.forName("UTF-8");
 
+    private final static int BUF_CAP = 0x200;
+
 
     private Readable source;
 
@@ -60,7 +62,7 @@ public class Scanner
         super();
         if (null != source){
             this.source = source;
-            this.buffer = CharBuffer.allocate(0x200);
+            this.buffer = CharBuffer.allocate(BUF_CAP);
             this.buffer.limit(0);
             this.open = true;
             this.read();
@@ -82,16 +84,16 @@ public class Scanner
     public Scanner(File source, Charset cs)
         throws java.io.FileNotFoundException
     {
-        this(Channels.newReader((new FileInputStream(source).getChannel()),cs.newDecoder(),-1));
+        this(Channels.newReader((new FileInputStream(source).getChannel()),cs.newDecoder(),BUF_CAP));
     }
     public Scanner(String source){
         this(new StringReader(source));
     }
     public Scanner(ReadableByteChannel source){
-        this(Channels.newReader(source,UTF8.newDecoder(),-1));
+        this(Channels.newReader(source,UTF8.newDecoder(),BUF_CAP));
     }
     public Scanner(ReadableByteChannel source, Charset cs){
-        this(Channels.newReader(source,cs.newDecoder(),-1));
+        this(Channels.newReader(source,cs.newDecoder(),BUF_CAP));
     }
 
 
@@ -169,7 +171,7 @@ public class Scanner
         if (this.open){
 
             if (buf.limit() == buf.capacity()){
-                CharBuffer copier = CharBuffer.allocate(buf.capacity()+0x200);
+                CharBuffer copier = CharBuffer.allocate(buf.capacity()+BUF_CAP);
                 copier.put(buf);
                 copier.flip();
                 buf = copier;
@@ -182,23 +184,28 @@ public class Scanner
             buf.position(tail);
             buf.limit(buf.capacity());
 
+            int read;
             try {
+                int bufRemaining = buf.remaining(); 
                 /*
                  * fill
                  */
-                if (-1 == source.read(buf))
+                if (-1 == (read = source.read(buf)))
                     this.close();
             }
             catch (IOException ioe) {
 
+                read = -1;
+
                 this.close();
             }
-            /*
-             * flip to head for consumer
-             */
-            buf.limit(buf.position());
-            buf.position(0);
-
+            if (-1 != read){
+                /*
+                 * flip to head for consumer
+                 */
+                buf.limit(read);
+                buf.position(0);
+            }
             return buf;
         }
         else
