@@ -6,10 +6,10 @@
   <property name="bin" value="bin"/>
   <property name="dst" value="."/>
 
-  <property name="coder.src" value="coder/src"/>
-  <property name="hapax3.src" value="hapax3/src"/>
-  <property name="beans.src" value="beans/src"/>
-  <property name="net.src" value="net/src"/>
+  <property name="coder.src" value="coder/lxl"/>
+  <property name="hapax3.src" value="hapax3/lxl"/>
+  <property name="beans.src" value="beans/lxl"/>
+  <property name="net.src" value="net/lxl"/>
 
   <property name="compiler.source" value="1.5"/>
   <property name="compiler.target" value="1.5"/>
