@@ -49,7 +49,7 @@ public final class Package
             StringTokenizer strtok = new StringTokenizer(line," \t\r\n;");
             if (2 == strtok.countTokens()){
                 strtok.nextToken();
-                this.name = strtok.nextToken();
+                this.name = OD.Decamel(strtok.nextToken());
                 return;
             }
             else

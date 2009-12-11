@@ -54,6 +54,10 @@ public final class OD
             throw new IllegalArgumentException();
     }
 
+    /**
+     * Upcase the first character and return 
+     * @see lxl.beans.Reflector#Camel
+     */
     public final static String Camel(String string){
         if (null != string){
             int strlen = string.length();
@@ -69,6 +73,9 @@ public final class OD
         else
             throw new IllegalArgumentException();
     }
+    /**
+     * Downcase the first character and return 
+     */
     public final static String Decamel(String string){
         if (1 < string.length())
             return (string.substring(0,1).toLowerCase()+string.substring(1));
@@ -295,8 +302,8 @@ public final class OD
         String packageName = pkg.getName();
         if (null == packageName || 0 == packageName.length())
             throw new ODStateException(pkg,"The object data model requires a package name.");
-
-        return Decamel(packageName);
+        else
+            return packageName;
     }
     public final static String ClassName(Class cd)
         throws ODStateException

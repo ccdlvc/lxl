@@ -257,8 +257,8 @@ public final class Class
 
         if (null != spec && null != name){
 
-            this.name = name;
-            this.nameDecamel = Decamel(name);
+            this.name = OD.Camel(name);
+            this.nameDecamel = OD.Decamel(name);
 
             if ("parent".equals(spec))
                 this.relation = Relation.Type.Parent;
@@ -354,10 +354,4 @@ public final class Class
         return this.imports;
     }
 
-    public final static String Decamel(String string){
-        if (1 < string.length())
-            return (string.substring(0,1).toLowerCase()+string.substring(1));
-        else
-            return string.toLowerCase();
-    }
 }

@@ -177,7 +177,7 @@ public final class Field
             if (null == typeName)
                 throw new Syntax("Malformed  field statement '"+line+"'.");
             else if (null == name)
-                name = Class.Decamel(typeName);
+                name = OD.Decamel(typeName);
 
             this.typeName = typeName;
             this.name = name;
