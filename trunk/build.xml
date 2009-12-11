@@ -137,6 +137,9 @@
       <fileset dir="." includes="test-*.jar"/>
     </delete>
     <delete dir="TestMain"/>
+    <delete dir="coder/test/src"/>
+    <delete dir="coder/test/bin"/>
+    <delete file="test.Main.xtm"/>
   </target>
 
   <target name="cleanb" depends="clean" description="Clean build">
@@ -159,11 +162,26 @@
     <echo>
       Test 'lxl.coder'.
     </echo>
+    <mkdir dir="coder/test/src"/>
+    <echo file="coder/test/src/A.expected">
+package x;
+
+public class A
+{
+
+}
+</echo>
     <java classpath="${coder.target.jar}" classname="lxl.coder.Main" fork="true">
       <arg value="coder/test/templates/test.Main.xtm"/>
       <arg value="coder/test/odl"/>
       <arg value="coder/test/src"/>
     </java>
+    <condition property="coder.test.success">
+      <filesmatch file1="coder/test/src/A.expected" file2="coder/test/src/x/A.java"/>
+    </condition>
+    <fail unless="coder.test.success">
+      Test 'lxl.coder' failed.
+    </fail>
   </target>
 
 </project>

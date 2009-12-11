@@ -32,7 +32,7 @@ import java.util.StringTokenizer;
 
 /**
  * A hierarchical section or variable name parsed into a list of
- * components delimited by solidus '/' or dot '.'.
+ * components delimited by solidus '/' (slash).
  * 
  * The user implements path interpretation, as demonstrated in {@link
  * AbstractData}.
@@ -240,7 +240,7 @@ public final class TemplateName
         this.from = null;
         if (null != source){
             StringBuilder strbuf = new StringBuilder();
-            StringTokenizer strtok = new StringTokenizer(source,"/.");
+            StringTokenizer strtok = new StringTokenizer(source,"/");
             int count = strtok.countTokens();
             Component[] path = new Component[count];
             for (int cc = 0; cc < count; cc++){
