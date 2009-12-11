@@ -290,7 +290,8 @@ public abstract class ContentLoader
         throw new UnsupportedOperationException();
     }
     protected boolean hasCopy(){
-        return (this.target().isFile());
+        File target = this.target();
+        return (target.exists() && target.isFile() && 0L != target.length());
     }
     protected void downloaded(java.lang.ClassLoader loader) throws IOException {
     }

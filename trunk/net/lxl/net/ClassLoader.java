@@ -107,6 +107,8 @@ public class ClassLoader
 
     protected volatile File temp, cache;
 
+    protected volatile URL base;
+
     protected final File alternative;
 
     protected final boolean clean, cleanOnly;
@@ -187,7 +189,7 @@ public class ClassLoader
     
 
     public URL getCodebase(){
-        throw new UnsupportedOperationException();
+        return this.base;
     }
     protected String findLibrary(String basename){
         throw new UnsupportedOperationException();
@@ -260,12 +262,37 @@ public class ClassLoader
         }
         return source;
     }
-    public static URL SourceUrl(String url){
+    public static URL SourceUrl(String source){
         try {
-            return SourceUrl(new URL(url));
+            return SourceUrl(new URL(source));
         }
         catch (MalformedURLException exc){
-            throw new RuntimeException(url,exc);
+
+            java.lang.ClassLoader current = Current();
+            if (current instanceof ClassLoader){
+                ClassLoader ccurrent = (ClassLoader)current;
+                if (null != ccurrent.alternative){
+                    try {
+                        File file = new File(ccurrent.alternative,source);
+                        return file.toURL();
+                    }
+                    catch (MalformedURLException exc2){
+                        throw new RuntimeException(source,exc2);
+                    }
+                }
+                else {
+                    URL base = ccurrent.getCodebase();
+                    if (null != base){
+                        try {
+                            return new URL(base,source);
+                        }
+                        catch (MalformedURLException exc2){
+                            throw new RuntimeException(source,exc2);
+                        }
+                    }
+                }
+            }
+            throw new RuntimeException(source,exc);
         }
     }
     public static URL SourceUrl(String base, String path){
