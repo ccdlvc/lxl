@@ -93,16 +93,33 @@ public class AbstractData
         return false;
     }
     public final String getVariable(TemplateName name){
-
+        /*
+         * Normal variables
+         */
         lxl.Map<String,String> variables = this.variables;
         if (null != variables){
             String value = variables.get(name.getName());
             if (null != value)
                 return value;
         }
-        if (this._hasVariable(name))
+        /*
+         * Hierarchical children
+         */
+        List<TemplateDataDictionary> children = this.getSection(name);
+        if (null != children){
+            Object value = name.dereferenceVariable(children);
+            if (null != value)
+                return value.toString();
+        }
+        /*
+         * Subclass (see {@link BeanData})
+         */
+        if (this._hasVariable(name)){
             return this._getVariable(name);
-
+        }
+        /*
+         * Scope inheritance
+         */
         TemplateDataDictionary parent = this.parent;
         if (null != parent){
             return parent.getVariable(name);
@@ -114,19 +131,12 @@ public class AbstractData
     }
     public final void setVariable(TemplateName name, String value){
 
-        if (this._hasVariable(name))
-            this._setVariable(name,value);
-        else {
-            lxl.Map<String,String> variables = this.variables;
-            if (null == variables){
-                variables = new lxl.Map<String,String>();
-                this.variables = variables;
-            }
-            variables.put(name.getName(),value);
+        lxl.Map<String,String> variables = this.variables;
+        if (null == variables){
+            variables = new lxl.Map<String,String>();
+            this.variables = variables;
         }
-    }
-    protected void _setVariable(TemplateName name, String value){
-        throw new UnsupportedOperationException();
+        variables.put(name.getName(),value);
     }
     public List<TemplateDataDictionary> getSection(TemplateName name){
 
@@ -137,7 +147,7 @@ public class AbstractData
         }
         if (null == section){
             /*
-             * Reflected
+             * Subclass reflected (see {@link BeanData})
              */
             if (this._hasSection(name))
                 section = this._getSection(name);
@@ -173,8 +183,19 @@ public class AbstractData
         if (name.is(0))
             return section;
         else {
+            /*
+             * Tail descent to (limit section) 
+             */
             TemplateDataDictionary sectionData = name.dereference(0,section);
-            return sectionData.getSection(new TemplateName(name));
+            if (null != sectionData){
+                List<TemplateDataDictionary> test = sectionData.getSection(new TemplateName(name));
+                if (null != test)
+                    return test;
+                else
+                    return section;
+            }
+            else
+                return null;
         }
     }
     protected boolean _hasSection(TemplateName name){
@@ -220,21 +241,21 @@ public class AbstractData
             }
         }
     }
-    public TemplateDataDictionary addSection(TemplateName name){
+    public List<TemplateDataDictionary> addSection(TemplateName name){
 
         return this.addSection(name, new AbstractData(this));
     }
-    public TemplateDataDictionary addSection(TemplateName name, TemplateDataDictionary newSection){
-
+    public List<TemplateDataDictionary> addSection(TemplateName name, TemplateDataDictionary newSection){
+        List<TemplateDataDictionary> section;
         lxl.Map<String,List<TemplateDataDictionary>> sections = this.sections;
         if (null == sections){
             sections = new lxl.Map<String,List<TemplateDataDictionary>>();
             this.sections = sections;
-            List<TemplateDataDictionary> section = Add(null,newSection);
+            section = Add(null,newSection);
             sections.put(name.getComponent(0),section);
         }
         else {
-            List<TemplateDataDictionary> section = sections.get(name.getComponent(0));
+            section = sections.get(name.getComponent(0));
             if (null == section){
                 section = Add(section,newSection);
                 sections.put(name.getComponent(0),section);
@@ -243,18 +264,17 @@ public class AbstractData
                 section = Add(section,newSection);
         }
         if (name.is(0))
-            return newSection;
+            return section;
         else
             return newSection.addSection(new TemplateName(name));
     }
 
-    public TemplateDataDictionary addBean(String name, Object bean){
+    public List<TemplateDataDictionary> addBean(String name, Object bean){
         return this.addBean(new TemplateName(name),bean);
     }
-    public TemplateDataDictionary addBean(TemplateName tn, Object bean){
+    public List<TemplateDataDictionary> addBean(TemplateName tn, Object bean){
         BeanData bd = new BeanData(bean);
-        this.addSection(tn,bd);
-        return bd;
+        return this.addSection(tn,bd);
     }
     public List<TemplateDataDictionary> addBeanList(String name, List copy){
         TemplateName tn = new TemplateName(name);

@@ -21,12 +21,14 @@ package lxl.hapax;
 
 import lxl.List;
 import lxl.beans.Reflector;
+import lxl.io.Primitive;
 
 /**
  * 
  */
 public class BeanData
     extends AbstractData
+    implements lxl.Dictionary<String,Object>
 {
 
     protected Reflector bean;
@@ -54,21 +56,51 @@ public class BeanData
         else
             return null;
     }
-    protected void _setVariable(TemplateName name, String value){
-        throw new UnsupportedOperationException();
-    }
-    /* ***************************************************************
-     * TODO
-     * 
-     * If the field type is list, transcribe to a list of primitives or beans.
-     * 
-     * Otherwise transcribe int a list of one primitive or bean 
-     * 
-     *****************************************************************/
     protected boolean _hasSection(TemplateName name){
-        return false;
+        return (null != this.bean.getType(name.getName()));
     }
     protected List<TemplateDataDictionary> _getSection(TemplateName name){
+
+        Class type = this.bean.getType(name.getName());
+        if (null != type){
+            Object value = this.bean.get(name.getName());
+
+            if (null == value)
+                return null;
+            else if (Primitive.Is(value.getClass()))
+                return null;
+            else {
+                BeanData bean = new BeanData(value);
+                return this.addBean(name,bean);
+            }
+        }
+        return null;
+    }
+    public Object get(Object key) {
+        return this.bean.get(key);
+    }
+    public Object put(String key, Object value){
         throw new UnsupportedOperationException();
+    }
+    public Object remove(Object key){
+        throw new UnsupportedOperationException();
+    }
+    public boolean containsKey(Object key){
+        return this.bean.containsKey(key);
+    }
+    public boolean isEmpty(){
+        return this.bean.isEmpty();
+    }
+    public java.util.Iterator<String> iteratorKeys(){
+        return this.bean.iteratorKeys();
+    }
+    public java.util.Iterator<Object> iteratorValues(){
+        return this.bean.iteratorValues();
+    }
+    public Iterable<String> keys(){
+        return this.bean.keys();
+    }
+    public lxl.Dictionary<String,Object> cloneDictionary(){
+        return this.bean.cloneDictionary();
     }
 }
