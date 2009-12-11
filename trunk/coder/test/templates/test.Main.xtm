@@ -3,5 +3,6 @@ package {{=package/name}};
 
 public class {{=class/name}}
 {
-
+{{#fields}}
+    {{=type}} {{=name}};{{/fields}}
 }

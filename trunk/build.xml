@@ -169,6 +169,7 @@ package x;
 public class A
 {
 
+    int fieldI;
 }
 </echo>
     <java classpath="${coder.target.jar}" classname="lxl.coder.Main" fork="true">
