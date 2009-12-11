@@ -212,13 +212,19 @@ public class AbstractData
             sections = new lxl.Map<String,List<TemplateDataDictionary>>();
             this.sections = sections;
 
-            TemplateDataDictionary newSection = new AbstractData(this);
-            List<TemplateDataDictionary> newSectionList = Add(null,newSection);
+            List<TemplateDataDictionary> newSectionList = new lxl.ArrayList<TemplateDataDictionary>();
             sections.put(name.getComponent(0),newSectionList);
             if (name.is(0))
                 return newSectionList;
-            else
+            else {
+                /*
+                 * Create section
+                 */
+                TemplateDataDictionary newSection = new AbstractData(this);
+                newSectionList.add(newSection);
+
                 return newSection.showSection(new TemplateName(name));
+            }
         }
         else {
             List<TemplateDataDictionary> section = sections.get(name.getComponent(0));
@@ -231,13 +237,19 @@ public class AbstractData
                 }
             }
             else {
-                TemplateDataDictionary newSection = new AbstractData(this);
-                section = Add(section,newSection);
+                section = new lxl.ArrayList<TemplateDataDictionary>();
                 this.sections.put(name.getComponent(0),section);
                 if (name.is(0))
                     return section;
-                else
+                else {
+                    /*
+                     * Create section
+                     */
+                    TemplateDataDictionary newSection = new AbstractData(this);
+                    section.add(newSection);
+
                     return newSection.showSection(new TemplateName(name));
+                }
             }
         }
     }
@@ -278,12 +290,19 @@ public class AbstractData
     }
     public List<TemplateDataDictionary> addBeanList(String name, List copy){
         TemplateName tn = new TemplateName(name);
-        List<TemplateDataDictionary> list = this.showSection(tn);
-        for (int cc = 0, count = copy.size(); cc < count; cc++){
-            Object bean = copy.get(cc);
-            list.add(new BeanData(bean));
+        int count = copy.size();
+        if (0 != count){
+            int cc = 0;
+            Object bean = copy.get(cc++);
+            List<TemplateDataDictionary> list = this.addSection(tn,(new BeanData(bean)));
+            for (; cc < count; cc++){
+                bean = copy.get(cc);
+                list.add(new BeanData(bean));
+            }
+            return list;
         }
-        return list;
+        else
+            return null;
     }
 
     public final static List<TemplateDataDictionary> Add(List<TemplateDataDictionary> list, TemplateDataDictionary data){
