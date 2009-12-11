@@ -25,13 +25,14 @@
  */
 package lxl.hapax;
 
+import lxl.Dictionary;
 import lxl.List;
 
 import java.util.StringTokenizer;
 
 /**
- * A section or variable name parsed into a list of components
- * delimited by solidus '/' (slash).
+ * A hierarchical section or variable name parsed into a list of
+ * components delimited by solidus '/' or dot '.'.
  * 
  * The user implements path interpretation, as demonstrated in {@link
  * AbstractData}.
@@ -51,7 +52,9 @@ public final class TemplateName
 {
 
     /**
-     * A name component has name, and an optional index
+     * A name component has name, and an optional qualifier for use
+     * when the name selects a collection.  Generally, an index can
+     * dereferece a list, and a name can dereference a map.
      * 
      * <pre><i>name</i> '['</code> <i>index</i> <code>']'</pre>.
      * 
@@ -64,7 +67,7 @@ public final class TemplateName
         implements Comparable<Component>
     {
 
-        public final String source, term;
+        public final String source, term, name;
 
         public final int index;
 
@@ -77,20 +80,25 @@ public final class TemplateName
                 this.term = strtok.nextToken();
                 this.index = 0;
                 this.source = source;
+                this.name = null;
                 break;
             case 2:
                 this.term = strtok.nextToken();
-                String term = strtok.nextToken();
+                String term = strtok.nextToken(), name;
                 int index;
                 try {
                     index = Integer.parseInt(term);
                     source = term+'['+index+']';
+                    name = null;
                 }
                 catch (NumberFormatException exc){
-                    throw new IllegalArgumentException(source,exc);
+                    index = -1;
+                    name = term;
+                    source = term+'['+name+']';
                 }
                 this.index = index;
                 this.source = source;
+                this.name = name;
                 break;
             default:
                 throw new IllegalArgumentException(source);
@@ -109,6 +117,36 @@ public final class TemplateName
                 else
                     throw new ArrayIndexOutOfBoundsException("In '"+this.source+"' at list size '"+list.size()+"'.");
             }
+        }
+        public Object dereference(Object object){
+            /*
+             * Called on result of dereferencing 'term' at root, and
+             * then on children in a name component list.
+             * 
+             * This procedure is fuzzy for this reason, and the
+             * general policy of maximized acceptance.
+             * 
+             * The requirement is not to give a wrong answer for a
+             * correct question.
+             */
+            if (object instanceof Dictionary){
+
+                if (null != this.name){
+                    Object test = ((Dictionary)object).get(this.name);
+                    if (null != test)
+                        return test;
+                }
+                {
+                    Object test = ((Dictionary)object).get(this.term);
+                    if (null != test)
+                        return test;
+                }
+            }
+            else if (object instanceof List){
+
+                return ((List)object).get(this.index);
+            }
+            return object;
         }
         public int hashCode(){
             return this.source.hashCode();
@@ -202,7 +240,7 @@ public final class TemplateName
         this.from = null;
         if (null != source){
             StringBuilder strbuf = new StringBuilder();
-            StringTokenizer strtok = new StringTokenizer(source,"/");
+            StringTokenizer strtok = new StringTokenizer(source,"/.");
             int count = strtok.countTokens();
             Component[] path = new Component[count];
             for (int cc = 0; cc < count; cc++){
@@ -274,15 +312,42 @@ public final class TemplateName
         else
             return null;
     }
-    public TemplateDataDictionary dereference(int idx, List<TemplateDataDictionary> list){
-        Component c = this.get(idx);
+    public TemplateDataDictionary dereference(int componentIndex, List<TemplateDataDictionary> list){
+        Component c = this.get(componentIndex);
         if (null != c)
             return c.dereference(list);
         else
-            throw new ArrayIndexOutOfBoundsException("In '"+this.source+"' at index '"+idx+"'.");
+            throw new ArrayIndexOutOfBoundsException("In '"+this.source+"' at index '"+componentIndex+"'.");
     }
     public TemplateDataDictionary dereference(List<TemplateDataDictionary> list){
         return this.dereference(0,list);
+    }
+    /**
+     * @return Primitive value, data dictionary, or list of data dictionary.
+     */
+    public Object dereference(Object value){
+        if (null != value){
+            for (Component c: this.path){
+                value = c.dereference(value);
+                if (null == value)
+                    return null;
+            }
+        }
+        return value;
+    }
+    public Object dereferenceVariable(Object value){
+        value = this.dereference(value);
+        if (value instanceof List)
+            return null;
+        else
+            return value;
+    }
+    public List<TemplateDataDictionary> dereferenceSection(Object value){
+        value = this.dereference(value);
+        if (value instanceof List)
+            return (List<TemplateDataDictionary>)value;
+        else
+            return null;
     }
     /**
      * @return Head

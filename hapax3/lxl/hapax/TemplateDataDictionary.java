@@ -28,8 +28,12 @@ package lxl.hapax;
 import lxl.List;
 
 /**
- * The implementation of {@link TemplateDictionary} as consumed by
- * {@link Template} is the specification of this interface.
+ * The {@link TemplateRenderer} pulls variable values and section
+ * lists from a template data dictionary.
+ * 
+ * The variables and sections referenced from a template are defined
+ * by the template data dictionary passed to the {@link
+ * TemplateRenderer}.
  * 
  * @author jdp
  */
@@ -75,6 +79,6 @@ public interface TemplateDataDictionary
     /**
      * @return New section.
      */
-    public TemplateDataDictionary addSection(TemplateName sectionName);
+    public List<TemplateDataDictionary> addSection(TemplateName sectionName);
 
 }

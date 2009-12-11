@@ -157,11 +157,13 @@
     </echo>
     <java classpath="${target.jar}" classname="lxl.Primes" fork="true"/>
     <echo>
-      And...
+      Test 'lxl.coder'.
     </echo>
-    <subant>
-      <fileset dir="." includes="**/buildtest.*.xml" />
-    </subant>
+    <java classpath="${coder.target.jar}" classname="lxl.coder.Main" fork="true">
+      <arg value="coder/test/templates/test.Main.xtm"/>
+      <arg value="coder/test/odl"/>
+      <arg value="coder/test/src"/>
+    </java>
   </target>
 
 </project>
