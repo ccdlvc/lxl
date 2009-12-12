@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="lxl" default="test">
+<project name="lxl" default="update">
 
   <property name="src" value="src"/>
   <property name="lib" value="lib"/>
@@ -16,6 +16,18 @@
   <property name="compiler.debug" value="true"/>
   <property name="compiler.encoding" value="utf-8"/>
 
+
+  <property file="${user.home}/fv3.build.properties"/>
+  <condition property="update.fv3.not">
+    <not>
+      <isset property="copyto.fv3.lxl-coder"/>
+    </not>
+  </condition>
+  <condition property="update.jbxml.not">
+    <not>
+      <isset property="copyto.jbxml.lxl-coder"/>
+    </not>
+  </condition>
 
   <property file="build.version"/>
 
@@ -51,7 +63,14 @@
     <srcfiles file="${toString:lib.lavax.jnlp}"/>
   </uptodate>
 
+  <target name="update" depends="test, update-fv3, update-jbxml" />
 
+  <target name="update-fv3" unless="update.fv3.not" depends="test">
+    <copy file="${coder.target.jar}" tofile="${copyto.fv3.lxl-coder}"/>
+  </target>
+  <target name="update-jbxml" unless="update.jbxml.not" depends="test">
+    <copy file="${coder.target.jar}" tofile="${copyto.jbxml.lxl-coder}"/>
+  </target>
   <target name="coder" depends="hapax3" unless="coder.target.jar.uptodate" description="build 'lxl.jar' and 'lxl-coder.jar'.">
 
     <mkdir dir="${bin}"/>

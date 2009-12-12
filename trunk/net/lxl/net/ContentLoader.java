@@ -99,7 +99,7 @@ public abstract class ContentLoader
         return this.sourcePath;
     }
     public final boolean isNotLoaded(){
-        return (!this.hasCopy());
+        return this.hasNotCopy();
     }
     public final boolean isLoaded(){
         return this.hasCopy();
@@ -141,7 +141,7 @@ public abstract class ContentLoader
      * @see Clean
      */
     public boolean download(java.lang.ClassLoader loader) throws IOException {
-        if (!this.hasCopy())
+        if (this.hasNotCopy()||this.overwrite())
             return this.overwritein(loader);
         else
             return true;
@@ -269,8 +269,7 @@ public abstract class ContentLoader
     public final JNLPRandomAccessFile getRandomAccessFile(String mode) throws IOException {
         /* **************************************
          *                                      *
-         * [TODO] implement for                 *
-         *         mapped file                  *
+         * [TODO] implement for mapped file     *
          *                                      *
          ****************************************/
         throw new UnsupportedOperationException();
@@ -289,13 +288,19 @@ public abstract class ContentLoader
          ****************************************/
         throw new UnsupportedOperationException();
     }
-    protected boolean hasCopy(){
+    protected final boolean hasCopy(){
         File target = this.target();
         return (target.exists() && target.isFile() && 0L != target.length());
     }
+    protected final boolean hasNotCopy(){
+        File target = this.target();
+        return ((!target.exists())||(!target.isFile())||(0L == target.length()));
+    }
+    protected boolean overwrite(){
+        return false;
+    }
     protected void downloaded(java.lang.ClassLoader loader) throws IOException {
     }
-
     protected void unpackToCache(java.lang.ClassLoader loader, boolean exe) throws IOException {
         File target = this.target();
         long targetLast = target.lastModified();
