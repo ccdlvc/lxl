@@ -71,6 +71,10 @@ public abstract class ContentLoader
 
     protected volatile File targetFile;
 
+    private volatile URLConnection sourceConnection;
+
+    private volatile long sourceLast, sourceLength;
+
 
     protected ContentLoader(URL source, boolean lazy){
         super();
@@ -141,21 +145,21 @@ public abstract class ContentLoader
      * @see Clean
      */
     public boolean download(java.lang.ClassLoader loader) throws IOException {
-        if (this.hasNotCopy()||this.overwrite())
-            return this.overwritein(loader);
-        else
-            return true;
+        try {
+            if (this.hasNotCopy()||this.overwrite())
+                return this.overwritein(loader);
+            else
+                return true;
+        }
+        finally {
+            this.disconnect();
+        }
     }
     public boolean overwritein(java.lang.ClassLoader loader) throws IOException {
-        URLConnection connection = this.source.openConnection();
-        connection.setRequestProperty("User-Agent","lxl.net.ContentLoader/1.0");
-        connection.setRequestProperty("Accept","text/xml, application/*, image/*");
-        connection.connect();
-        long networkLast = connection.getLastModified();
-        int networkLength = connection.getContentLength();
+        URLConnection connection = this.connect();
         File target = this.target();
-        if (target.isFile()){
-            long request = (networkLast / 1000);
+        if (target.isFile() && target.exists()){
+            long request = (this.sourceLast / 1000);
             long file = (target.lastModified() / 1000);
             if (request <= file){
                 connection.getInputStream().close();
@@ -168,16 +172,22 @@ public abstract class ContentLoader
             FileOutputStream out = new FileOutputStream(target);
             try {
                 byte[] iob = new byte[0x200];
-                int count = networkLength;
-                int read;
-                while (0 < (read = in.read(iob,0,0x200))){
-                    out.write(iob,0,read);
-                    count -= read;
+                if (0L < this.sourceLength && Integer.MAX_VALUE > this.sourceLength){
+                    int count = (int)this.sourceLength;
+                    int read;
+                    while (0 < (read = in.read(iob,0,0x200))){
+                        out.write(iob,0,read);
+                        count -= read;
+                    }
+                    target.setLastModified(this.sourceLast);
+                    this.requested = System.currentTimeMillis();
+                    this.downloaded(loader);
+                    return true;
                 }
-                target.setLastModified(networkLast);
-                this.requested = System.currentTimeMillis();
-                this.downloaded(loader);
-                return true;
+                else {
+                    String erm = String.format("Source length out of bounds '%d' @ '%s'.",this.source.toString(),this.sourceLength);
+                    throw new IllegalStateException(erm);
+                }
             }
             catch (IOException exc){
                 exc.printStackTrace();
@@ -195,6 +205,7 @@ public abstract class ContentLoader
         }
         finally {
             in.close();
+            this.disconnect();
         }
     }
     public final InputStream getInputStream() throws IOException {
@@ -288,6 +299,33 @@ public abstract class ContentLoader
          ****************************************/
         throw new UnsupportedOperationException();
     }
+    protected final URLConnection connect()
+        throws IOException
+    {
+        URLConnection sourceConnection = this.sourceConnection;
+        if (null == sourceConnection){
+
+            sourceConnection = this.source.openConnection();
+            sourceConnection.setRequestProperty("User-Agent","lxl.net.ContentLoader/1.0");
+            sourceConnection.setRequestProperty("Accept","text/xml, application/*, image/*");
+            sourceConnection.connect();
+            this.sourceConnection = sourceConnection;
+            this.sourceLast = sourceConnection.getLastModified();
+            this.sourceLength = sourceConnection.getContentLength();
+        }
+        return sourceConnection;
+    }
+    protected final void disconnect(){
+        URLConnection sourceConnection = this.sourceConnection;
+        if (null != sourceConnection){
+            this.sourceConnection = null;
+            try {
+                sourceConnection.getInputStream().close();
+            }
+            catch (Throwable ignore){
+            }
+        }
+    }
     protected final boolean hasCopy(){
         File target = this.target();
         return (target.exists() && target.isFile() && 0L != target.length());
@@ -296,8 +334,24 @@ public abstract class ContentLoader
         File target = this.target();
         return ((!target.exists())||(!target.isFile())||(0L == target.length()));
     }
-    protected boolean overwrite(){
-        return false;
+    protected final boolean overwrite(){
+        File target = this.target();
+        if (target.isFile() && target.exists()){
+            long request = (this.sourceLast / 1000);
+            long file = (target.lastModified() / 1000);
+            if (request > file)
+                return true;
+            else {
+                request = this.sourceLength;
+                file = target.length();
+                if (request != file)
+                    return true;
+                else
+                    return false;
+            }
+        }
+        else
+            return true;
     }
     protected void downloaded(java.lang.ClassLoader loader) throws IOException {
     }
