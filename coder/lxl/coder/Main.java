@@ -97,6 +97,47 @@ public class Main
         }
     }
     /**
+     * Output one bean into argument "src" file.
+     */
+    public final static void ProcessTemplate(File xtm, File odl, File src)
+        throws IOException, TemplateException, Syntax, ODStateException
+    {
+
+        TemplateRenderer template = new Template(xtm.toURL()).createTemplateRenderer();
+
+        try {
+            Class clas = new Class(odl);
+
+            AbstractData top = new AbstractData();
+
+            top.addBean("class",clas);
+            top.addBean("package",clas.pack);
+            top.addBeanList("imports",clas.imports);
+            top.addBeanList("fields",clas.fields);
+            top.addBeanList("methods",clas.methods);
+            top.addBeanList("interfaces",clas.interfaces);
+
+
+            File srcDir = src.getParentFile();
+            if (null != srcDir && (!srcDir.exists())){
+                if (!srcDir.mkdirs())
+                    throw new TemplateException("Unable to create directory containing output '"+srcDir.getPath()+"'.");
+            }
+            PrintWriter out = new PrintWriter(new FileWriter(src));
+            try {
+                OD.GenerateBeanSource(template, top, out);
+                return ;
+            }
+            finally {
+                out.close();
+            }
+        }
+        catch (Syntax syntax){
+
+            throw new Syntax("In '"+odl+"'",syntax);
+        }
+    }
+    /**
      * Run template using directories.
      * 
      * @return List of target products
@@ -213,35 +254,56 @@ public class Main
             File xtm = new File(argv[0]);
             File odl = new File(argv[1]);
             File src = new File(argv[2]);
-            if (xtm.isFile() && odl.isDirectory() && src.isDirectory()){
+            if (xtm.isFile()){
+                if (odl.isDirectory() && src.isDirectory()){
 
-                int rc = 0;
-                try {
-                    System.out.println("Template: "+xtm.getPath());
-                    System.out.println("Source: "+odl.getPath());
-                    System.out.println("Target: "+src.getPath());
-                    List<File> products = Main.ProcessDirectories(xtm,odl,src);
-                    for (File product : products){
-                        System.out.println("Product: "+product.getPath());
+                    int rc = 0;
+                    try {
+                        System.out.println("Template: "+xtm.getPath());
+                        System.out.println("Source: "+odl.getPath());
+                        System.out.println("Target: "+src.getPath());
+                        List<File> products = Main.ProcessDirectories(xtm,odl,src);
+                        for (File product : products){
+                            System.out.println("Product: "+product.getPath());
+                        }
+                    }
+                    catch (Throwable thrown){
+                        thrown.printStackTrace();
+                        rc = 1;
+                    }
+                    finally {
+                        System.exit(rc);
                     }
                 }
-                catch (Throwable thrown){
-                    thrown.printStackTrace();
-                    rc = 1;
+                else if (odl.exists() && odl.isFile() && (!src.isDirectory())){
+
+                    int rc = 0;
+                    try {
+                        System.out.println("Template: "+xtm.getPath());
+                        System.out.println("Source: "+odl.getPath());
+                        System.out.println("Target: "+src.getPath());
+                        Main.ProcessTemplate(xtm,odl,src);
+                        System.out.println("Product: "+src.getPath());
+                    }
+                    catch (Throwable thrown){
+                        thrown.printStackTrace();
+                        rc = 1;
+                    }
+                    finally {
+                        System.exit(rc);
+                    }
                 }
-                finally {
-                    System.exit(rc);
+                else {
+
+                    if (!odl.isDirectory())
+                        System.err.println("Error, file or directory not found: '"+odl.getPath()+"'.");
+
+                    if (!src.isDirectory())
+                        System.err.println("Error, directory not found: '"+src.getPath()+"'.");
                 }
             }
             else {
-                if (!xtm.isFile())
-                    System.err.println("Error, file not found: '"+xtm.getPath()+"'.");
-
-                if (!odl.isDirectory())
-                    System.err.println("Error, directory not found: '"+odl.getPath()+"'.");
-
-                if (!src.isDirectory())
-                    System.err.println("Error, directory not found: '"+src.getPath()+"'.");
+                System.err.println("Error, file not found: '"+xtm.getPath()+"'.");
             }
         }
         else

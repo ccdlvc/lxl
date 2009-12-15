@@ -105,6 +105,11 @@ public class Map<K,V>
         else
             return null;
     }
+    public void clear(){
+        if (null != this.index)
+            this.index.clear();
+        super.clear();
+    }
     public boolean containsKey(Object key){
         Comparable ck = (Comparable)key;
         Index idx = this.index();
