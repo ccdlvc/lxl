@@ -27,8 +27,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
- * Main {@link ClassLoader}.
+ * A web desktop style {@link ClassLoader}.
  * 
+ * @see http://jnlp-loader.googlecode.com/
  * @author jdp
  */
 public class ClassLoader
@@ -109,6 +110,8 @@ public class ClassLoader
 
     protected volatile URL base;
 
+    protected final String[] argv;
+
     protected final File alternative;
 
     protected final boolean clean, cleanOnly;
@@ -142,13 +145,13 @@ public class ClassLoader
         Thread.currentThread().setContextClassLoader(this);
 
         if (null != argv && 0 != argv.length){
-            int argc = 0;
-            if ("clean".equals(argv[argc])){
-                argc += 1;
+            int argx = 0;
+            if ("clean".equals(argv[argx])){
+                argx += 1;
                 this.clean = true;
-                if (argc < argv.length){
-                    if ("only".equals(argv[argc])){
-                        argc += 1;
+                if (argx < argv.length){
+                    if ("only".equals(argv[argx])){
+                        argx += 1;
                         this.cleanOnly = true;
                     }
                     else
@@ -162,17 +165,25 @@ public class ClassLoader
                 this.cleanOnly = false;
             }
 
-            if (argc < argv.length){
-                File alt = new File(argv[argc]);
-                if (alt.isDirectory())
+            if (argx < argv.length){
+                File alt = new File(argv[argx]);
+                if (alt.exists() && alt.isDirectory()){
+                    argx += 1;
                     this.alternative = alt;
-                else
+                    this.argv = ShiftTo(argv,argx);
+                }
+                else {
+                    this.argv = ShiftTo(argv,argx);
                     this.alternative = null;
+                }
             }
-            else
+            else {
+                this.argv = ShiftTo(argv,argx);
                 this.alternative = null;
+            }
         }
         else {
+            this.argv = null;
             this.clean = false;
             this.cleanOnly = false;
             this.alternative = null;
@@ -238,6 +249,29 @@ public class ClassLoader
     }
     public final Clean cleanCache(){
         return new Clean(this.findCache());
+    }
+    /**
+     * @return Get arg will not return null.
+     */
+    public boolean hasMainArg(int idx){
+        if (-1 < idx){
+            String[] argv = this.argv;
+            return (null != argv && idx < argv.length);
+        }
+        else
+            return false;
+    }
+    /**
+     * @return Main argument (not consumed) indexed from zero, or null
+     * for index out of bounds.
+     */
+    public String getMainArg(int idx){
+        if (-1 < idx){
+            String[] argv = this.argv;
+            if (null != argv && idx < argv.length)
+                return argv[idx];
+        }
+        return null;
     }
     protected void logFileWrite(File file) throws IOException {
 
@@ -370,5 +404,27 @@ public class ClassLoader
         }
         else
             return b;
+    }
+    /**
+     * Truncate argv array to include the argument start.
+     * @param argv Array of string
+     * @param start Inclusive starting argv offset (position zero in
+     * the returned result)
+     * @return Shifted array, or null for empty.
+     */
+    public final static String[] ShiftTo(String[] argv, int start){
+        if (null == argv || 0 >= start)
+            return argv;
+        else {
+            int argc = argv.length;
+            if (start < argc){
+                int nlen = (argc - start);
+                String[] copier = new String[nlen];
+                System.arraycopy(argv,start,copier,0,nlen);
+                return copier;
+            }
+            else
+                return null;
+        }
     }
 }

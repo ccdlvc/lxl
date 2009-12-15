@@ -97,7 +97,7 @@ public final class Field
 
     private Comment comment;
 
-    public final String typeName, name;
+    public final String typeName, name, nameCamel;
 
     public final Persistence.Type persistence;
 
@@ -181,6 +181,7 @@ public final class Field
 
             this.typeName = typeName;
             this.name = name;
+            this.nameCamel = OD.Camel(name);
             this.uniqueness = uniqueness;
             this.persistence = persistence;
             this.relational = relational;
@@ -193,6 +194,9 @@ public final class Field
 
     public String getName(){
         return this.name;
+    }
+    public String getNameCamel(){
+        return this.nameCamel;
     }
     public Object getType(){
         return this.typeName;

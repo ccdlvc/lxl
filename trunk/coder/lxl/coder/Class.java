@@ -158,6 +158,11 @@ public final class Class
     private String definitionClassName;
 
 
+    public Class(java.io.File source)
+        throws IOException, Syntax
+    {
+        this(new Reader(source));
+    }
     public Class(Reader reader)
         throws IOException, Syntax
     {

@@ -105,4 +105,8 @@ public interface List<T>
     public List cloneList();
 
     public boolean isEmpty();
+    /**
+     * Unsafe array is the internal list.
+     */
+    public T[] array();
 }

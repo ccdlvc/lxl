@@ -178,6 +178,12 @@ public class Index
     }
 
 
+    public void clear(){
+        Entry table[][] = this.table;
+        for (int cc = 0, len = this.size; cc < len; cc++){
+            table[cc] = null;
+        }
+    }
     public Index clone(){
         try {
             Index clone = (Index)super.clone();

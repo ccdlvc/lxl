@@ -488,7 +488,9 @@ public class ArrayList<T>
         else
             return (0 != list.length);
     }
-
+    /**
+     * Safe array is copied defensively.
+     */
     @SuppressWarnings("unchecked")
     public T[] toArray(Class component) {
         T[] list = this.list;
@@ -507,7 +509,12 @@ public class ArrayList<T>
             return copy;
         }
     }
-
+    /**
+     * Unsafe array is the internal list.
+     */
+    public T[] array(){
+        return this.list;
+    }
     public Comparator<T> getComparator() {
         return comparator;
     }
