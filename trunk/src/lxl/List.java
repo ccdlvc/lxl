@@ -108,5 +108,5 @@ public interface List<T>
     /**
      * Unsafe array is the internal list.
      */
-    public T[] array();
+    public Object[] array();
 }
