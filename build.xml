@@ -66,10 +66,10 @@
   <target name="update" depends="test, update-fv3, update-jbxml" />
 
   <target name="update-fv3" unless="update.fv3.not" depends="test">
-    <copy file="${coder.target.jar}" tofile="${copyto.fv3.lxl-coder}"/>
+    <copy file="${coder.target.jar}" todir="${copyto.fv3.lxl-coder}"/>
   </target>
   <target name="update-jbxml" unless="update.jbxml.not" depends="test">
-    <copy file="${coder.target.jar}" tofile="${copyto.jbxml.lxl-coder}"/>
+    <copy file="${coder.target.jar}" todir="${copyto.jbxml.lxl-coder}"/>
   </target>
   <target name="coder" depends="hapax3" unless="coder.target.jar.uptodate" description="build 'lxl.jar' and 'lxl-coder.jar'.">
 
