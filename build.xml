@@ -19,14 +19,24 @@
 
   <property file="${user.home}/fv3.build.properties"/>
   <condition property="update.fv3.not">
-    <not>
-      <isset property="copyto.fv3.lxl-coder"/>
-    </not>
+    <or>
+      <not>
+        <isset property="copyto.fv3.lxl-coder"/>
+      </not>
+      <not>
+        <available file="${copyto.fv3.lxl-coder}" type="dir"/>
+      </not>
+    </or>
   </condition>
   <condition property="update.jbxml.not">
-    <not>
-      <isset property="copyto.jbxml.lxl-coder"/>
-    </not>
+    <or>
+      <not>
+        <isset property="copyto.jbxml.lxl-coder"/>
+      </not>
+      <not>
+        <available file="${copyto.jbxml.lxl-coder}" type="dir"/>
+      </not>
+    </or>
   </condition>
 
   <property file="build.version"/>
