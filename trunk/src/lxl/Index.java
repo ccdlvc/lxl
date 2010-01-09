@@ -220,6 +220,21 @@ public class Index
             throw new InternalError(exc.toString());
         }
     }
+    public Comparable key(int index){
+
+        Entry ent, list[], table[][] = this.table;
+        for (int cc = 0, cz = this.size, bb, bz; cc < cz; cc++){
+            list = table[cc];
+            if (null != list){
+                for (bb = 0, bz = list.length; bb < bz; bb++){
+                    ent = list[bb];
+                    if (index == ent.index)
+                        return ent.key;
+                }
+            }
+        }
+        return null;
+    }
     public Index drop(Comparable key){
         int table = ((null == key)?(0):(Math.abs(key.hashCode())%this.size));
         Entry[] list = this.table[table];
