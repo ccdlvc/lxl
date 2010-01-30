@@ -37,7 +37,7 @@ import java.io.PrintStream;
  * 
  * @author jdp
  */
-public class Index 
+public class Index<K extends java.lang.Comparable>
     extends Object
     implements java.io.Serializable,
                java.lang.Cloneable,
@@ -47,18 +47,18 @@ public class Index
     /**
      * Collision table entry holds a list element key and index.
      */
-    public final static class Entry 
+    public final static class Entry<K extends java.lang.Comparable>
         extends Object
         implements java.io.Serializable,
                    java.lang.Comparable
     {
         private final static long serialVersionUID = 1;
 
-        protected final Comparable key;
+        protected final K key;
         protected final int index;
 
 
-        public Entry(Comparable key, int index){
+        public Entry(K key, int index){
             super();
             this.key = key;
             this.index = index;
@@ -85,24 +85,24 @@ public class Index
             }
         }
     }
-    public static class Iterator
+    public static class Iterator<K extends java.lang.Comparable>
         extends Object
-        implements java.util.Iterator,
-                   Iterable
+        implements java.util.Iterator<K>,
+                   java.lang.Iterable<K>
     {
 
-        private final Entry[] list;
+        private final Entry<K>[] list;
 
         private final int length;
 
         private int index;
 
 
-        public Iterator(Index index){
+        public Iterator(Index<K> index){
             super();
-            Entry[][] table = index.table;
+            Entry<K>[][] table = index.table;
             int tableLen = table.length;
-            Entry row[];
+            Entry<K> row[];
             /*
              * Count
              */
@@ -116,7 +116,7 @@ public class Index
             /*
              * Copy
              */
-            Entry[] list = new Entry[length];
+            Entry<K>[] list = (Entry<K>[])(new Entry[length]);
 
             for (int cc = 0, cz = tableLen, lc = 0, rr, rz; cc < cz; cc++){
                 row = table[cc];
@@ -133,9 +133,9 @@ public class Index
         public boolean hasNext(){
             return (this.index < this.length);
         }
-        public Object next(){
+        public K next(){
             if (this.index < this.length)
-                return this.list[this.index++];
+                return this.list[this.index++].key;
             else
                 throw new java.util.NoSuchElementException();
         }
@@ -148,7 +148,7 @@ public class Index
     }
 
 
-    private volatile Entry[][] table;
+    private volatile Entry<K>[][] table;
 
     public final int size;
 
@@ -156,21 +156,21 @@ public class Index
     public Index(int size){
         super();
         size = Primes.Ceil(size);
-        this.table = new Entry[size][];
+        this.table = (Entry<K>[][])(new Entry[size][]);
         this.size = size;
     }
     public Index(Index copy, int resize){
         super();
         resize = Primes.Ceil(resize);
-        this.table = new Entry[resize][];
+        this.table = (Entry<K>[][])(new Entry[resize][]);
         this.size = resize;
 
-        Entry list[], table[][] = copy.table;
+        Entry<K> list[], table[][] = copy.table;
         for (int cc = 0, cz = this.size, lc, lz; cc < cz; cc++){
             list = table[cc];
             if (null != list){
                 for (lc = 0, lz = list.length; lc < lz; lc++){
-                    Entry e = list[lc];
+                    Entry<K> e = list[lc];
                     this.add(e.key,e.index);
                 }
             }
@@ -179,17 +179,17 @@ public class Index
 
 
     public void clear(){
-        Entry table[][] = this.table;
+        Entry<K> table[][] = this.table;
         for (int cc = 0, len = this.size; cc < len; cc++){
             table[cc] = null;
         }
     }
-    public Index clone(){
+    public Index<K> clone(){
         try {
-            Index clone = (Index)super.clone();
+            Index<K> clone = (Index<K>)super.clone();
             clone.table = this.table.clone();
 
-            Entry list[], table[][] = clone.table;
+            Entry<K> list[], table[][] = clone.table;
             for (int cc = 0, len = this.size; cc < len; cc++){
                 list = table[cc];
                 if (null != list)
@@ -201,12 +201,12 @@ public class Index
             throw new InternalError(exc.toString());
         }
     }
-    private Index clone(int drop){
+    private Index<K> clone(int drop){
         try {
-            Index clone = (Index)super.clone();
+            Index<K> clone = (Index<K>)super.clone();
             clone.table = this.table.clone();
 
-            Entry list[], table[][] = clone.table;
+            Entry<K> list[], table[][] = clone.table;
             for (int cc = 0, len = this.size; cc < len; cc++){
                 if (drop != cc){
                     list = table[cc];
@@ -220,9 +220,9 @@ public class Index
             throw new InternalError(exc.toString());
         }
     }
-    public Comparable key(int index){
+    public K key(int index){
 
-        Entry ent, list[], table[][] = this.table;
+        Entry<K> ent, list[], table[][] = this.table;
         for (int cc = 0, cz = this.size, bb, bz; cc < cz; cc++){
             list = table[cc];
             if (null != list){
@@ -235,37 +235,37 @@ public class Index
         }
         return null;
     }
-    public Index drop(Comparable key){
+    public Index<K> drop(K key){
         int table = ((null == key)?(0):(Math.abs(key.hashCode())%this.size));
-        Entry[] list = this.table[table];
+        Entry<K>[] list = this.table[table];
         if (null == list)
             return this;
         else {
-            Entry entry;
+            Entry<K> entry;
             scan:
             for (int cc = 0, len = list.length; cc < len; cc++){
                 entry = list[cc];
                 switch(entry.compareTo(key)){
                 case 0: {
-                    Index clone = this.clone(table);
+                    Index<K> clone = this.clone(table);
                     if (1 == len)
                         clone.table[table] = null;
                     else {
                         int nlen = (len-1);
                         if (0 == cc){
-                            Entry[] copier = new Entry[nlen];
+                            Entry<K>[] copier = (Entry<K>[])(new Entry[nlen]);
                             System.arraycopy(list,1,copier,0,nlen);
 
                             clone.table[table] = copier;
                         }
                         else if (nlen == cc){
-                            Entry[] copier = new Entry[nlen];
+                            Entry<K>[] copier = (Entry<K>[])(new Entry[nlen]);
                             System.arraycopy(list,0,copier,0,nlen);
 
                             clone.table[table] = copier;
                         }
                         else {
-                            Entry[] copier = new Entry[nlen];
+                            Entry<K>[] copier = (Entry<K>[])(new Entry[nlen]);
                             System.arraycopy(list,0,copier,0,cc);
                             System.arraycopy(list,(cc+1),copier,cc,(nlen-cc));
 
@@ -283,13 +283,13 @@ public class Index
             return this;
         }
     }
-    public int get(Comparable key){
+    public int get(K key){
         int table = ((null == key)?(0):(Math.abs(key.hashCode())%this.size));
-        Entry[] list = this.table[table];
+        Entry<K>[] list = this.table[table];
         if (null == list)
             return -1;
         else {
-            Entry entry;
+            Entry<K> entry;
             scan:
             for (int cc = 0, len = list.length; cc < len; cc++){
                 entry = list[cc];
@@ -305,46 +305,46 @@ public class Index
             return -1;
         }
     }
-    public void add(Comparable key, int index){
+    public void add(K key, int index){
         if (-1 < index){
             int table = ((null == key)?(0):(Math.abs(key.hashCode())%this.size));
-            Entry[] list = this.table[table];
+            Entry<K>[] list = this.table[table];
             if (null == list){
-                list = new Entry[]{new Entry(key,index)};
+                list = (Entry<K>[])(new Entry[]{new Entry<K>(key,index)});
                 this.table[table] = list;
             }
             else {
                 int len = list.length, term = (len-1), comp;
-                Entry entry, copier[];
+                Entry<K> entry, copier[];
                 for (int cc = 0; cc < len; cc++){
                     entry = list[cc];
                     comp = entry.compareTo(key);
                     if (0 == comp){
-                        list[cc] = new Entry(key,index);/*(assume index or key instance change)*/
+                        list[cc] = new Entry<K>(key,index);/*(assume index or key instance change)*/
                         return;
                     }
                     else if (-1 != comp){
-                        copier = new Entry[len+1];
+                        copier = (Entry<K>[])(new Entry[len+1]);
                         if (0 == cc){
-                            copier = new Entry[len+1];
+                            copier = (Entry<K>[])(new Entry[len+1]);
                             System.arraycopy(list,0,copier,1,len);
-                            copier[0] = new Entry(key,index);
+                            copier[0] = new Entry<K>(key,index);
                             this.table[table] = copier;
                             return;
                         }
                         else {
-                            copier = new Entry[len+1];
+                            copier = (Entry<K>[])(new Entry[len+1]);
                             System.arraycopy(list,0,copier,0,cc);
-                            copier[cc] = new Entry(key,index);
+                            copier[cc] = new Entry<K>(key,index);
                             System.arraycopy(list,cc,copier,(cc+1),(len-cc));
                             this.table[table] = copier;
                             return;
                         }
                     }
                 }
-                copier = new Entry[len+1];
+                copier = (Entry<K>[])(new Entry[len+1]);
                 System.arraycopy(list,0,copier,0,len);
-                copier[len] = new Entry(key,index);
+                copier[len] = new Entry<K>(key,index);
                 this.table[table] = copier;
             }
         }
@@ -353,9 +353,9 @@ public class Index
     }
     public void distribution(boolean keys, PrintStream out){
         boolean line;
-        for (Entry[] list: this.table){
+        for (Entry<K>[] list: this.table){
             line = true;
-            for (Entry entry: list){
+            for (Entry<K> entry: list){
                 line = false;
                 if (keys)
                     out.print("["+entry.key+","+entry.index+"]");
@@ -369,11 +369,11 @@ public class Index
         } 
     }
     @Override
-    public Iterator iterator(){
-        return new Iterator(this);
+    public Iterator<K> iterator(){
+        return new Iterator<K>(this);
     }
-    public Iterable keys(){
-        return new Iterator(this);
+    public Iterable<K> keys(){
+        return new Iterator<K>(this);
     }
 
     public final static void main(String[] test){

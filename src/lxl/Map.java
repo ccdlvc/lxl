@@ -25,12 +25,12 @@ package lxl;
  * 
  * @author jdp
  */
-public class Map<K,V>
+public class Map<K extends java.lang.Comparable,V>
     extends ArrayList<V>
     implements Dictionary<K,V>
 {
 
-    protected volatile Index index ;
+    protected volatile Index<K> index ;
 
 
     /**
@@ -44,7 +44,7 @@ public class Map<K,V>
      */
     public Map(int tablesize){
         super();
-        this.index = new Index(tablesize);
+        this.index = new Index<K>(tablesize);
     }
 
 
@@ -65,46 +65,44 @@ public class Map<K,V>
         if (1 > tablesize)
             this.index = null;
         else if (null == this.index)
-            this.index = new Index(tablesize);
+            this.index = new Index<K>(tablesize);
         else if (tablesize != this.index.size)
-            this.index = new Index(this.index,tablesize);
+            this.index = new Index<K>(this.index,tablesize);
     }
     /**
      * Lazy default construction
      */
-    protected final Index index(){
+    protected final Index<K> index(){
         if (null == this.index){
             int z = this.getLength();
             if (1 > z)
                 z = 7;
-            this.index = new Index(z);
+            this.index = new Index<K>(z);
         }
         return this.index;
     }
     public V put(K key, V value){
-        Comparable ck = (Comparable)key;
         int idx = super.add(value);
-        this.index().add(ck,idx);
+        this.index().add(key,idx);
         return value;
     }
     public int put2(K key, V value){
-        Comparable ck = (Comparable)key;
         int idx = super.add(value);
-        this.index().add(ck,idx);
+        this.index().add(key,idx);
         return idx;
     }
     public V get(Object key){
-        Comparable ck = (Comparable)key;
+        K ck = (K)key;
         int idx = this.index().get(ck);
         return super.get(idx);
     }
     public V remove(Object key){
-        Comparable ck = (Comparable)key;
+        K ck = (K)key;
         int idx = this.index().get(ck);
         if (-1 != idx){
             V value = super.removeIn(idx);
             if (null != this.index){
-                this.index = this.index.drop( (Comparable)key);
+                this.index = this.index.drop( (K)key);
             }
             return value;
         }
@@ -117,7 +115,7 @@ public class Map<K,V>
         super.clear();
     }
     public boolean containsKey(Object key){
-        Comparable ck = (Comparable)key;
+        K ck = (K)key;
         Index idx = this.index();
         return (-1 != idx.get(ck));
     }
@@ -131,7 +129,7 @@ public class Map<K,V>
         return super.iterator();
     }
     public Iterable<K> keys(){
-        return (Iterable<K>)this.index().keys();
+        return this.index().keys();
     }
 
 
