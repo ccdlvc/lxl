@@ -171,7 +171,7 @@ public class Index<K extends java.lang.Comparable>
             if (null != list){
                 for (lc = 0, lz = list.length; lc < lz; lc++){
                     Entry<K> e = list[lc];
-                    this.add(e.key,e.index);
+                    this.put(e.key,e.index);
                 }
             }
         }
@@ -305,7 +305,7 @@ public class Index<K extends java.lang.Comparable>
             return -1;
         }
     }
-    public void add(K key, int index){
+    public void put(K key, int index){
         if (-1 < index){
             int table = ((null == key)?(0):(Math.abs(key.hashCode())%this.size));
             Entry<K>[] list = this.table[table];
@@ -381,7 +381,7 @@ public class Index<K extends java.lang.Comparable>
         Index index = new Index(20);
         for (int cc = 0; cc < 62; cc++){
             Character key = new Character(alphabet.charAt(cc));
-            index.add(key,cc);
+            index.put(key,cc);
         }
         index.distribution(false,System.out);
         int failure = 0;

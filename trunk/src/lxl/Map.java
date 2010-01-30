@@ -83,12 +83,12 @@ public class Map<K extends java.lang.Comparable,V>
     }
     public V put(K key, V value){
         int idx = super.add(value);
-        this.index().add(key,idx);
+        this.index().put(key,idx);
         return value;
     }
     public int put2(K key, V value){
         int idx = super.add(value);
-        this.index().add(key,idx);
+        this.index().put(key,idx);
         return idx;
     }
     public V get(Object key){
