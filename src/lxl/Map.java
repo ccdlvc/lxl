@@ -87,6 +87,12 @@ public class Map<K,V>
         this.index().add(ck,idx);
         return value;
     }
+    public int put2(K key, V value){
+        Comparable ck = (Comparable)key;
+        int idx = super.add(value);
+        this.index().add(ck,idx);
+        return idx;
+    }
     public V get(Object key){
         Comparable ck = (Comparable)key;
         int idx = this.index().get(ck);
