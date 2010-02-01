@@ -30,17 +30,18 @@ public class Map<K extends java.lang.Comparable,V>
     implements Dictionary<K,V>
 {
 
-    protected volatile Index<K> index ;
+    protected Index<K> index ;
 
 
     /**
-     * Lazy constructor
+     * Default {@link Index} size.
      */
     public Map(){
         super();
+        this.index = new Index<K>();
     }
     /**
-     * Optimistic constructor
+     * @param tablesize {@link Index} size
      */
     public Map(int tablesize){
         super();
@@ -58,52 +59,42 @@ public class Map<K extends java.lang.Comparable,V>
     public Dictionary<K,V> cloneDictionary(){
         return this.clone();
     }
-    /**
-     * Lazy construction or reconstruction
-     */
-    public final void tableSize(int tablesize){
-        if (1 > tablesize)
-            this.index = null;
-        else if (null == this.index)
-            this.index = new Index<K>(tablesize);
-        else if (tablesize != this.index.size)
-            this.index = new Index<K>(this.index,tablesize);
-    }
-    /**
-     * Lazy default construction
-     */
-    protected final Index<K> index(){
-        if (null == this.index){
-            int z = this.getLength();
-            if (1 > z)
-                z = 7;
-            this.index = new Index<K>(z);
-        }
-        return this.index;
-    }
     public V put(K key, V value){
-        int idx = super.add(value);
-        this.index().put(key,idx);
+        Index<K> index = this.index;
+        int idx = index.get(key);
+        if (-1 == idx){
+            idx = super.add(value);
+            index.put(key,idx);
+        }
+        else
+            super.set(idx,value);
+
         return value;
     }
     public int put2(K key, V value){
-        int idx = super.add(value);
-        this.index().put(key,idx);
+        Index<K> index = this.index;
+        int idx = index.get(key);
+        if (-1 == idx){
+            idx = super.add(value);
+            index.put(key,idx);
+        }
+        else
+            super.set(idx,value);
+
         return idx;
     }
     public V get(Object key){
         K ck = (K)key;
-        int idx = this.index().get(ck);
+        int idx = this.index.get(ck);
         return super.get(idx);
     }
     public V remove(Object key){
         K ck = (K)key;
-        int idx = this.index().get(ck);
+        Index<K> index = this.index;
+        int idx = index.get(ck);
         if (-1 != idx){
             V value = super.removeIn(idx);
-            if (null != this.index){
-                this.index = this.index.drop( (K)key);
-            }
+            index.drop(ck,idx);
             return value;
         }
         else
@@ -116,20 +107,38 @@ public class Map<K extends java.lang.Comparable,V>
     }
     public boolean containsKey(Object key){
         K ck = (K)key;
-        Index idx = this.index();
+        Index idx = this.index;
         return (-1 != idx.get(ck));
     }
     public boolean isEmpty(){
         return (0 == this.getLength());
     }
     public java.util.Iterator<K> iteratorKeys(){
-        return (java.util.Iterator<K>)this.index().iterator();
+        return this.index.iterator();
     }
     public java.util.Iterator<V> iteratorValues(){
         return super.iterator();
     }
     public Iterable<K> keys(){
-        return this.index().keys();
+        return this.index.keys();
+    }
+    public int add(V item) {
+        throw new UnsupportedOperationException();
+    }
+    public void insert(V item, int index) {
+        throw new UnsupportedOperationException();
+    }
+    public int indexOf(K key) {
+        return this.index.get(key);
+    }
+    public Sequence<V> remove(int index, int count) {
+        throw new UnsupportedOperationException();
+    }
+    public int set(V value){
+        throw new UnsupportedOperationException();
+    }
+    public V replace(V prev, V next){
+        throw new UnsupportedOperationException();
     }
 
 

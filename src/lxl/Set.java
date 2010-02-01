@@ -1,50 +1,112 @@
 /*
- * Copyright (c) 2008 VMware, Inc.
- * Copyright (c) 2009 John Pritchard, WTKX Project Group
+ * Syntelos-X
+ * Copyright (C) 2009 John Pritchard
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * 02110-1301 USA.
  */
 package lxl;
 
-import java.util.Comparator;
-
 /**
- * Collection interface representing a group of unique elements.
+ * A list of unique elements.  Elements of this list are members of
+ * the class Comparable.
  *
- * @author gbrown
+ * @author jdp
  */
-public interface Set<E>
-    extends Collection<E>
+public class Set<T extends java.lang.Comparable>
+    extends ArrayList<T>
 {
 
-    /**
-     * @see SetListener#elementAdded(Set, Object)
-     */
-    public void add(E element);
+    protected Index<T> index ;
+
 
     /**
-     * @see SetListener#elementRemoved(Set, Object)
+     * Default {@link Index} size
      */
-    public void remove(E element);
-
+    public Set(){
+        super();
+        this.index = new Index<T>();
+    }
     /**
-     * @see SetListener#setCleared(Set)
+     * @param tablesize {@link Index} size
      */
-    public void clear();
+    public Set(int tablesize){
+        super();
+        this.index = new Index<T>(tablesize);
+    }
 
+
+    @Override
+    public Set clone(){
+        Set clone = (Set)super.clone();
+        if (null != this.index)
+            clone.index = this.index.clone();
+        return clone;
+    }
+    public int indexOf(T item) {
+        return this.index.get(item);
+    }
+    public void insert(T item, int idx) {
+        super.insert(item,idx);
+        this.index.increment(idx);
+    }
+    public int add(T item) {
+        int idx = this.indexOf(item);
+        if (-1 == idx){
+            idx = super.add(item);
+            this.index.put(item,idx);
+        }
+        else {
+            this.set(idx,item);
+        }
+        return idx;
+    }
+    public T set(int idx, T value){
+        T previous = super.set(idx,value);
+        if (previous != value){
+            Index<T> index = this.index;
+            index.drop(previous);
+            index.put(value,idx);
+        }
+        return previous;
+    }
+    protected T removeIn (int idx) {
+        T dropped = super.removeIn(idx);
+        {
+            Index<T> index = this.index;
+            index.drop(dropped);
+            index.decrement(idx);
+        }
+        return dropped;
+    }
     /**
-     * @see SetListener#setCleared(Set)
+     * Compatible with java collections API.
      */
-    public void setComparator(Comparator<E> comparator);
+    public T remove (Object item) {
+        T tee = (T)item;
+        Index<T> index = this.index;
+        int idx = index.get(tee);
+        T dropped;
+        if (-1 != idx){
+            dropped = super.remove(idx);
+            index.drop(dropped);
+            index.decrement(idx);
+        }
+        else
+            dropped = null;
 
+        return dropped;
+    }
 }

@@ -9,15 +9,16 @@ package lxl;
 public class Primes
     extends Object
 {
-    static boolean Test;
+    public final static Primes Instance = new Primes();
 
-    static Primes Instance = new Primes();
-
-    public final static int Floor(int size){
-        return Instance.ceil(size);
+    public final static int Floor(int num){
+        return Instance.ceil(num);
     }
-    public final static int Ceil(int size){
-        return Instance.ceil(size);
+    public final static int Ceil(int num){
+        return Instance.ceil(num);
+    }
+    public final static int Get(int idx){
+        return Instance.get(idx);
     }
 
     protected int[] list = {
@@ -87,6 +88,19 @@ public class Primes
     }
 
 
+    public int size(){
+        return this.list.length;
+    }
+    public boolean has(int idx){
+        return (-1 < idx && idx < this.list.length);
+    }
+    public int get(int idx){
+        int[] list = this.list;
+        if (-1 < idx && idx < list.length)
+            return list[idx];
+        else
+            throw new ArrayIndexOutOfBoundsException(String.valueOf(idx));
+    }
     /**
      * @return The input argument is prime.
      */
@@ -144,8 +158,8 @@ public class Primes
     }
 
     public static void main(String[] argv){
-        Test = true;
-        Primes primes = new Primes();
+
+        Primes primes = Primes.Instance;
 
         int[] testInput = {
             0,   1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20

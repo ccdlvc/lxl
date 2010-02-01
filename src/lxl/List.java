@@ -80,6 +80,12 @@ public interface List<T>
     public Sequence<T> remove(int index, int count);
 
     /**
+     * @param t Untyped T following java collections compatibility
+     * @return The argument 
+     */
+    public T remove(Object t);
+
+    /**
      * @see ListListener#itemsRemoved(List, int, Sequence)
      */
     public void clear();
