@@ -229,9 +229,9 @@ public class ArrayList<T>
     }
 
 
-    public ArrayList clone(){
+    public ArrayList<T> clone(){
         try {
-            ArrayList clone = (ArrayList)super.clone();
+            ArrayList<T> clone = (ArrayList<T>)super.clone();
             if (null != this.list)
                 clone.list = this.list.clone();
             return clone;
@@ -240,7 +240,7 @@ public class ArrayList<T>
             throw new InternalError("Cloneable");
         }
     }
-    public List cloneList(){
+    public List<T> cloneList(){
         return this.clone();
     }
     public int add(T item) {
@@ -456,10 +456,12 @@ public class ArrayList<T>
         else
             throw new IllegalArgumentException("Previous value not found.");
     }
+    public boolean contains(T item){
+        return (-1 != this.indexOf(item));
+    }
     public int indexOf(T item) {
         return IndexOf(this.list,this.comparator,item);
     }
-
     public int getLength() {
         T[] list = this.list;
         if (null == list)
