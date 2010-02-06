@@ -39,6 +39,8 @@ public interface List<T>
      */
     public int add(T item);
 
+    public List<T> addAll(List<T> collection);
+
     /**
      * Inserts an item into the list.
      *

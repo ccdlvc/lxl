@@ -273,7 +273,11 @@ public class ArrayList<T>
             return index;
         }
     }
-
+    public List<T> addAll(List<T> collection){
+        for (T item: collection)
+            this.add(item);
+        return this;
+    }
     public void insert(T item, int index) {
         if (-1 < index){
             T[] list = this.list;
