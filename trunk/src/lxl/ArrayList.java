@@ -229,7 +229,7 @@ public class ArrayList<T>
     }
 
 
-    public ArrayList<T> clone(){
+    public List<T> clone(){
         try {
             ArrayList<T> clone = (ArrayList<T>)super.clone();
             if (null != this.list)
@@ -240,9 +240,7 @@ public class ArrayList<T>
             throw new InternalError("Cloneable");
         }
     }
-    public List<T> cloneList(){
-        return this.clone();
-    }
+
     public int add(T item) {
         int index = -1;
         T[] list = this.list;
