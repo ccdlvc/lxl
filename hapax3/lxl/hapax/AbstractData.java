@@ -318,7 +318,7 @@ public class AbstractData
     }
     public final static List<TemplateDataDictionary> SectionClone(TemplateDataDictionary parent, List<TemplateDataDictionary> section){
 
-        List<TemplateDataDictionary> sectionClone = section.cloneList();
+        List<TemplateDataDictionary> sectionClone = section.clone();
 
         for (int sectionIndex = 0, sectionCount = sectionClone.size(); sectionIndex < sectionCount; sectionIndex++){
             TemplateDataDictionary sectionItem = sectionClone.get(sectionIndex);
