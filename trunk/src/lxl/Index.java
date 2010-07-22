@@ -398,12 +398,14 @@ public class Index<K extends java.lang.Comparable>
         boolean line;
         for (Entry<K>[] list: this.table){
             line = true;
-            for (Entry<K> entry: list){
-                line = false;
-                if (keys)
-                    out.print("["+entry.key+","+entry.index+"]");
-                else
-                    out.print("["+entry.index+"]");
+            if (null != list){
+                for (Entry<K> entry: list){
+                    line = false;
+                    if (keys)
+                        out.print("["+entry.key+","+entry.index+"]");
+                    else
+                        out.print("["+entry.index+"]");
+                }
             }
             if (line)
                 out.println("[]");
@@ -418,10 +420,11 @@ public class Index<K extends java.lang.Comparable>
     public void increment(int index){
 
         for (Entry<K>[] list: this.table){
-
-            for (Entry<K> entry: list){
-                if (index >= entry.index)
-                    entry.index += 1;
+            if (null != list){
+                for (Entry<K> entry: list){
+                    if (index >= entry.index)
+                        entry.index += 1;
+                }
             }
         } 
     }
@@ -432,10 +435,11 @@ public class Index<K extends java.lang.Comparable>
     public void decrement(int index){
 
         for (Entry<K>[] list: this.table){
-
-            for (Entry<K> entry: list){
-                if (index <= entry.index)
-                    entry.index -= 1;
+            if (null != list){
+                for (Entry<K> entry: list){
+                    if (index <= entry.index)
+                        entry.index -= 1;
+                }
             }
         } 
     }
