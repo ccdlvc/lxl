@@ -60,11 +60,9 @@
     <do-update src="${net.target.jar}" tgt="${lxl.net.update}" />
   </target>
 
-  <target name="coder" depends="hapax3" unless="coder.target.jar.uptodate" description="build 'lxl.jar' and 'lxl-coder.jar'.">
+  <target name="coder" depends="hapax3" description="build 'lxl.jar' and 'lxl-coder.jar'.">
 
     <compile src="${coder.src}" ver="${coder.ver}" bin="${bin}" classpath.id="hapax3.target.ref"/>
-
-    <delete file="${coder.target.jar}"/>
 
     <archive target="${coder.target.jar}" bin="${bin}" manifest="${coder.src}/../Manifest.mf">
       <pack>
@@ -75,11 +73,9 @@
     <flush dir="${bin}" type="class"/>
   </target>
 
-  <target name="hapax3" depends="beans" unless="hapax3.target.jar.uptodate" description="build 'lxl.jar' and 'lxl-hapax3.jar'.">
+  <target name="hapax3" depends="beans" description="build 'lxl.jar' and 'lxl-hapax3.jar'.">
 
     <compile src="${hapax3.src}" ver="${hapax3.ver}" bin="${bin}" classpath.id="beans.target.ref"/>
-
-    <delete file="${hapax3.target.jar}"/>
 
     <archive target="${hapax3.target.jar}" bin="${bin}" manifest="${hapax3.src}/../Manifest.mf">
       <pack>
@@ -90,11 +86,9 @@
     <flush dir="${bin}" type="class"/>
   </target>
 
-  <target name="beans" depends="net" unless="beans.target.jar.uptodate" description="build 'lxl.jar' and 'lxl-beans.jar'.">
+  <target name="beans" depends="net" description="build 'lxl.jar' and 'lxl-beans.jar'.">
 
     <compile src="${beans.src}" ver="${beans.ver}" bin="${bin}" classpath.id="net.target.ref"/>
-
-    <delete file="${beans.target.jar}"/>
 
     <archive target="${beans.target.jar}" bin="${bin}" manifest="${beans.src}/../Manifest.mf">
       <pack>
@@ -105,7 +99,7 @@
     <flush dir="${bin}" type="class"/>
   </target>
 
-  <target name="net" depends="jar" unless="net.target.jar.uptodate" description="build 'lxl.jar' and 'lxl-net.jar'.">
+  <target name="net" depends="jar" description="build 'lxl.jar' and 'lxl-net.jar'.">
 
     <path id="net.compiler.classpath">
       <path refid="lib.javax.jnlp"/>
@@ -117,8 +111,6 @@
 
     <compile src="${net.src}" ver="${net.ver}" bin="${bin}" classpath.id="net.compiler.classpath"/>
 
-    <delete file="${net.target.jar}"/>
-
     <archive target="${net.target.jar}" bin="${bin}" manifest="${net.src}/../Manifest.mf">
       <pack>
 	<zipfileset src="${target.jar}"/>
@@ -129,7 +121,7 @@
     <flush dir="${bin}" type="class"/>
   </target>
 
-  <target name="jar" depends="compile" unless="target.jar.uptodate" description="Package bin to target jar, clean bin.">
+  <target name="jar" depends="compile" description="Package bin to target jar, clean bin.">
     <archive.cleanly/>
 
     <archive target="${target.jar}" bin="${bin}" manifest="${src}/Manifest.mf">
@@ -139,7 +131,7 @@
     <flush dir="${bin}" type="class"/>
   </target>
 
-  <target name="compile" depends="version" unless="target.jar.uptodate" description="Compile src to bin">
+  <target name="compile" depends="version" description="Compile src to bin">
 
     <compile src="${src}" ver="${ver}" bin="${bin}" classpath.id="lib.path"/>
   </target>
@@ -153,10 +145,6 @@
     <delete dir="coder/test/src"/>
     <delete dir="coder/test/bin"/>
     <delete file="test.Main.xtm"/>
-  </target>
-
-  <target name="cleanb" depends="clean" description="Clean build">
-    <antcall target="jar"/>
   </target>
 
   <target name="test" depends="coder" description="Run unit tests">
