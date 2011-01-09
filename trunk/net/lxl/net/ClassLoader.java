@@ -367,6 +367,14 @@ public class ClassLoader
     /**
      * Concatenate with '/' file path separator.
      */
+    public final static URL NewURL(URL base, String path)
+	throws MalformedURLException
+    {
+	return new URL(Fcat(base.toExternalForm(),path));
+    }
+    /**
+     * Concatenate with '/' file path separator.
+     */
     public final static String Fcat(String a, String b){
         if (null != a && 0 != a.length()){
             if (null != b && 0 != b.length()){

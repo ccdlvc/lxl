@@ -4,125 +4,105 @@
   <property name="src" value="src"/>
   <property name="lib" value="lib"/>
   <property name="bin" value="bin"/>
+  <property name="ver" value="ver/src"/>
   <property name="dst" value="."/>
 
   <property name="coder.src" value="coder/lxl"/>
+  <property name="coder.ver" value="ver/coder/src"/>
   <property name="hapax3.src" value="hapax3/lxl"/>
+  <property name="hapax3.ver" value="ver/hapax3/src"/>
   <property name="beans.src" value="beans/lxl"/>
+  <property name="beans.ver" value="ver/beans/src"/>
   <property name="net.src" value="net/lxl"/>
+  <property name="net.ver" value="ver/net/src"/>
 
   <property name="compiler.source" value="1.5"/>
   <property name="compiler.target" value="1.5"/>
+  <property name="compiler.optimize" value="false"/>
   <property name="compiler.debug" value="true"/>
-  <property name="compiler.encoding" value="utf-8"/>
+  <property name="compiler.encoding" value="UTF-8"/>
+
+  <property file="${user.home}/update.properties"/>
+
+  <import file="ant/build.in.java.xml"/>
+  <import file="ant/build.in.update.xml"/>
+  <import file="ant/build.in.version.xml"/>
 
 
-  <property file="${user.home}/fv3.build.properties"/>
-  <condition property="update.fv3.not">
-    <or>
-      <not>
-        <isset property="copyto.fv3.lxl-coder"/>
-      </not>
-      <not>
-        <available file="${copyto.fv3.lxl-coder}" type="dir"/>
-      </not>
-    </or>
-  </condition>
-  <condition property="update.jbxml.not">
-    <or>
-      <not>
-        <isset property="copyto.jbxml.lxl-coder"/>
-      </not>
-      <not>
-        <available file="${copyto.jbxml.lxl-coder}" type="dir"/>
-      </not>
-    </or>
-  </condition>
+  <path id="lib.path">
 
-  <property file="build.version"/>
-
-  <property name="this.version" value="${version.major}.${version.minor}.${version.build}"/>
-
-
-  <property name="target.jar" value="${dst}/${ant.project.name}-${this.version}.jar"/>
-
-  <property name="coder.target.jar" value="${dst}/${ant.project.name}-coder-${this.version}.jar"/>
-  <property name="hapax3.target.jar" value="${dst}/${ant.project.name}-hapax3-${this.version}.jar"/>
-  <property name="net.target.jar" value="${dst}/${ant.project.name}-net-${this.version}.jar"/>
+    <fileset dir="${lib}">
+      <include name="**/*.jar" />
+    </fileset>
+  </path>
 
   <path id="lib.javax.jnlp">
     <fileset dir="net" includes="**/javax-jnlp.jar" />
   </path>
 
+  <target name="update" if="lxl.update" depends="test,update.coder,update.hapax3,update.net">
 
-  <uptodate property="target.jar.uptodate" targetfile="${target.jar}">
-    <srcfiles dir="${src}" includes="**/*.java"/>
-  </uptodate>
-
-  <uptodate property="coder.target.jar.uptodate" targetfile="${coder.target.jar}">
-    <srcfiles dir="${coder.src}" includes="**/*.java"/>
-    <srcfiles file="${hapax3.target.jar}"/>
-  </uptodate>
-  <uptodate property="hapax3.target.jar.uptodate" targetfile="${hapax3.target.jar}">
-    <srcfiles dir="${hapax3.src}" includes="**/*.java"/>
-    <srcfiles file="${net.target.jar}"/>
-  </uptodate>
-  <uptodate property="net.target.jar.uptodate" targetfile="${net.target.jar}">
-    <srcfiles dir="${net.src}" includes="**/*.java"/>
-    <srcfiles file="${target.jar}"/>
-    <srcfiles file="${toString:lib.lavax.jnlp}"/>
-  </uptodate>
-
-  <target name="update" depends="test, update-fv3, update-jbxml" />
-
-  <target name="update-fv3" unless="update.fv3.not" depends="test">
-    <copy file="${coder.target.jar}" todir="${copyto.fv3.lxl-coder}"/>
+    <do-update src="${target.jar}" tgt="${lxl.update}" />
   </target>
-  <target name="update-jbxml" unless="update.jbxml.not" depends="test">
-    <copy file="${coder.target.jar}" todir="${copyto.jbxml.lxl-coder}"/>
+
+  <target name="update.coder" if="lxl.coder.update">
+
+    <do-update src="${coder.target.jar}" tgt="${lxl.coder.update}" />
   </target>
+
+  <target name="update.hapax3" if="lxl.hapax3.update">
+
+    <do-update src="${hapax3.target.jar}" tgt="${lxl.hapax3.update}" />
+  </target>
+
+  <target name="update.net" if="lxl.net.update">
+
+    <do-update src="${net.target.jar}" tgt="${lxl.net.update}" />
+  </target>
+
   <target name="coder" depends="hapax3" unless="coder.target.jar.uptodate" description="build 'lxl.jar' and 'lxl-coder.jar'.">
 
-    <mkdir dir="${bin}"/>
-    <javac srcdir="${coder.src}" destdir="${bin}" debug="${compiler.debug}" encoding="${compiler.encoding}"
-           classpath="${hapax3.target.jar}" source="${compiler.source}" target="${compiler.target}" />
+    <compile src="${coder.src}" ver="${coder.ver}" bin="${bin}" classpath.id="hapax3.target.ref"/>
 
     <delete file="${coder.target.jar}"/>
-    <jar jarfile="${coder.target.jar}" basedir="${bin}">
-      <manifest>
-        <attribute name="Main-Class" value="lxl.coder.Main"/>
-      </manifest>
-      <zipfileset src="${hapax3.target.jar}"/>
-    </jar>
-    <delete dir="${bin}"/>
+
+    <archive target="${coder.target.jar}" bin="${bin}" manifest="${coder.src}/../Manifest.mf">
+      <pack>
+	<zipfileset src="${hapax3.target.jar}"/>
+      </pack>
+    </archive>
+
+    <flush dir="${bin}" type="class"/>
   </target>
 
   <target name="hapax3" depends="beans" unless="hapax3.target.jar.uptodate" description="build 'lxl.jar' and 'lxl-hapax3.jar'.">
 
-    <mkdir dir="${bin}"/>
-    <javac srcdir="${hapax3.src}" destdir="${bin}" debug="${compiler.debug}" encoding="${compiler.encoding}"
-           classpath="${beans.target.jar}" source="${compiler.source}" target="${compiler.target}" />
+    <compile src="${hapax3.src}" ver="${hapax3.ver}" bin="${bin}" classpath.id="beans.target.ref"/>
 
     <delete file="${hapax3.target.jar}"/>
-    <jar jarfile="${hapax3.target.jar}" basedir="${bin}">
-      <zipfileset src="${beans.target.jar}"/>
-    </jar>
-    <delete dir="${bin}"/>
+
+    <archive target="${hapax3.target.jar}" bin="${bin}" manifest="${hapax3.src}/../Manifest.mf">
+      <pack>
+	<zipfileset src="${beans.target.jar}"/>
+      </pack>
+    </archive>
+
+    <flush dir="${bin}" type="class"/>
   </target>
 
   <target name="beans" depends="net" unless="beans.target.jar.uptodate" description="build 'lxl.jar' and 'lxl-beans.jar'.">
 
-    <property name="beans.target.jar" value="${dst}/${ant.project.name}-beans-${this.version}.jar"/>
-
-    <mkdir dir="${bin}"/>
-    <javac srcdir="${beans.src}" destdir="${bin}" debug="${compiler.debug}" encoding="${compiler.encoding}"
-           classpath="${net.target.jar}" source="${compiler.source}" target="${compiler.target}" />
+    <compile src="${beans.src}" ver="${beans.ver}" bin="${bin}" classpath.id="net.target.ref"/>
 
     <delete file="${beans.target.jar}"/>
-    <jar jarfile="${beans.target.jar}" basedir="${bin}">
-      <zipfileset src="${net.target.jar}"/>
-    </jar>
-    <delete dir="${bin}"/>
+
+    <archive target="${beans.target.jar}" bin="${bin}" manifest="${beans.src}/../Manifest.mf">
+      <pack>
+	<zipfileset src="${net.target.jar}"/>
+      </pack>
+    </archive>
+
+    <flush dir="${bin}" type="class"/>
   </target>
 
   <target name="net" depends="jar" unless="net.target.jar.uptodate" description="build 'lxl.jar' and 'lxl-net.jar'.">
@@ -132,37 +112,41 @@
       <path location="${target.jar}"/>
     </path>
 
-    <echo message="lib.javax.jnlp = ${toString:lib.javax.jnlp}"/>
-    <echo message="net.compiler.classpath = ${toString:net.compiler.classpath}"/>
+    <!-- echo message="lib.javax.jnlp = ${toString:lib.javax.jnlp}"/ -->
+    <!-- echo message="net.compiler.classpath = ${toString:net.compiler.classpath}"/ -->
 
-    <mkdir dir="${bin}"/>
-    <javac srcdir="${net.src}" destdir="${bin}" debug="${compiler.debug}" encoding="${compiler.encoding}"
-           classpathref="net.compiler.classpath" source="${compiler.source}" target="${compiler.target}" />
+    <compile src="${net.src}" ver="${net.ver}" bin="${bin}" classpath.id="net.compiler.classpath"/>
 
     <delete file="${net.target.jar}"/>
-    <jar jarfile="${net.target.jar}" basedir="${bin}">
-      <zipfileset src="${target.jar}"/>
-      <zipfileset src="${toString:lib.javax.jnlp}"/>
-    </jar>
-    <delete dir="${bin}"/>
+
+    <archive target="${net.target.jar}" bin="${bin}" manifest="${net.src}/../Manifest.mf">
+      <pack>
+	<zipfileset src="${target.jar}"/>
+	<zipfileset src="${toString:lib.javax.jnlp}"/>
+      </pack>
+    </archive>
+
+    <flush dir="${bin}" type="class"/>
   </target>
 
   <target name="jar" depends="compile" unless="target.jar.uptodate" description="Package bin to target jar, clean bin.">
-    <delete file="${target.jar}"/>
-    <jar jarfile="${target.jar}" basedir="${bin}" />
-    <delete dir="${bin}"/>
+    <archive.cleanly/>
+
+    <archive target="${target.jar}" bin="${bin}" manifest="${src}/Manifest.mf">
+      <pack/>
+    </archive>
+
+    <flush dir="${bin}" type="class"/>
   </target>
 
-  <target name="compile" unless="target.jar.uptodate" description="Compile src to bin">
-    <mkdir dir="${bin}"/>
-    <javac srcdir="${src}" destdir="${bin}" debug="${compiler.debug}" encoding="${compiler.encoding}"
-           source="${compiler.source}" target="${compiler.target}" />
+  <target name="compile" depends="version" unless="target.jar.uptodate" description="Compile src to bin">
+
+    <compile src="${src}" ver="${ver}" bin="${bin}" classpath.id="lib.path"/>
   </target>
 
   <target name="clean" description="Delete products">
-    <delete dir="${bin}"/>
+    <clean bin="${bin}" this="."/>
     <delete>
-      <fileset dir="." includes="lxl-*.jar"/>
       <fileset dir="." includes="test-*.jar"/>
     </delete>
     <delete dir="TestMain"/>
@@ -212,6 +196,44 @@ public class A
     <fail unless="coder.test.success">
       Test 'lxl.coder' failed.
     </fail>
+  </target>
+
+  <target name="version" description="Report current project version.">
+    <version/>
+
+    <property name="target.jar" value="${dst}/${ant.project.name}-${this.version}.jar"/>
+
+    <property name="coder.target.jar" value="${dst}/${ant.project.name}-coder-${this.version}.jar"/>
+    <path id="coder.target.ref">
+      <path location="${coder.target.jar}"/>
+    </path>
+    <property name="hapax3.target.jar" value="${dst}/${ant.project.name}-hapax3-${this.version}.jar"/>
+    <path id="hapax3.target.ref">
+      <path location="${hapax3.target.jar}"/>
+    </path>
+    <property name="net.target.jar" value="${dst}/${ant.project.name}-net-${this.version}.jar"/>
+    <path id="net.target.ref">
+      <path location="${net.target.jar}"/>
+    </path>
+    <property name="beans.target.jar" value="${dst}/${ant.project.name}-beans-${this.version}.jar"/>
+    <path id="beans.target.ref">
+      <path location="${beans.target.jar}"/>
+    </path>
+  </target>
+
+  <target name="build" description="Increment project version build number.">
+    <version-build/>
+    <version/>
+  </target>
+
+  <target name="major" description="Increment project version major number.">
+    <version-major/>
+    <version/>
+  </target>
+
+  <target name="minor" description="Increment project version minor number.">
+    <version-minor/>
+    <version/>
   </target>
 
 </project>
