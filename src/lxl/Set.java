@@ -46,14 +46,32 @@ public class Set<T extends java.lang.Comparable>
         super();
         this.index = new Index<T>(tablesize);
     }
+    public Set(Collection<T> copy){
+        this(3 * copy.size());
+        for (T item: copy)
+            this.add(item);
+    }
+    public Set(java.util.Iterator<T> copy){
+        this();
+        while (copy.hasNext())
+            this.add(copy.next());
+    }
 
 
+    public Set<T> reindex(){
+
+        this.index = this.index.reindex();
+        return this;
+    }
     @Override
     public Set clone(){
         Set clone = (Set)super.clone();
         if (null != this.index)
             clone.index = this.index.clone();
         return clone;
+    }
+    public boolean contains(T item){
+        return (-1 < this.index.get(item));
     }
     public int indexOf(T item) {
         return this.index.get(item);
@@ -66,7 +84,10 @@ public class Set<T extends java.lang.Comparable>
         int idx = this.indexOf(item);
         if (-1 == idx){
             idx = super.add(item);
+
             this.index.put(item,idx);
+
+            this.reindex();
         }
         else {
             this.set(idx,item);

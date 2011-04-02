@@ -25,13 +25,19 @@ import java.util.Comparator;
  * @author jdp
  */
 public interface Collection<T>
-    extends Cloneable
+    extends Cloneable, Iterable<T>, Comparable<Collection<T>>
 {
 
     /**
      * Removes all elements from the collection.
      */
     public void clear();
+
+    public int size();
+
+    public int add(T item);
+
+    public boolean contains(T item);
 
     /**
      * Returns the collection's sort order.
@@ -53,4 +59,10 @@ public interface Collection<T>
      * collection is unsorted.
      */
     public void setComparator(Comparator<T> comparator);
+
+    public Object[] toArray();
+    public Object[] toArraySorted();
+
+    public T[] toArray(Class component);
+    public T[] toArraySorted(Class component);
 }

@@ -603,6 +603,9 @@ public class Reflector
     public Iterator<String> iteratorKeys() {
         return new PropertyIteratorKeys();
     }
+    public lxl.Set<String> keySet() {
+        return new lxl.Set( new PropertyIteratorKeys());
+    }
     public Iterator<Object> iteratorValues() {
         return new PropertyIteratorValues();
     }

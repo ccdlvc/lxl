@@ -188,7 +188,7 @@ public class Index<K extends java.lang.Comparable>
         this.size = resize;
 
         Entry<K> list[], table[][] = copy.table;
-        for (int cc = 0, cz = this.size, lc, lz; cc < cz; cc++){
+        for (int cc = 0, cz = table.length, lc, lz; cc < cz; cc++){
             list = table[cc];
             if (null != list){
                 for (lc = 0, lz = list.length; lc < lz; lc++){
@@ -200,6 +200,18 @@ public class Index<K extends java.lang.Comparable>
     }
 
 
+    public final float load(){
+        final float c = this.count;
+        final float z = this.size;
+        return (c/z);
+    }
+    public Index<K> reindex(){
+
+        if (3f < this.load())
+            return new Index<K>(this,(this.count>>1));
+        else
+            return this;
+    }
     public void clear(){
         Entry<K> table[][] = this.table;
         for (int cc = 0, len = this.size; cc < len; cc++){
@@ -450,18 +462,44 @@ public class Index<K extends java.lang.Comparable>
     public Iterable<K> keys(){
         return new Iterator<K>(this);
     }
+    public Set<K> keySet(){
+        return new Set(new Iterator<K>(this));
+    }
 
     public final static void main(String[] test){
+
         final String alphabet = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        Index index = new Index(20);
+        Index index = new Index();
         for (int cc = 0; cc < 62; cc++){
             Character key = new Character(alphabet.charAt(cc));
             index.put(key,cc);
         }
+        System.out.printf("INDEX Test Characters [Index Loading %d]%n%n",Math.round(index.load()));
         index.distribution(false,System.err);//(err)
         int failure = 0;
         for (int cc = 0; cc < 62; cc++){
             Character key = new Character(alphabet.charAt(cc));
+            int idx = index.get(key);
+            if (idx != cc){
+                failure++;
+                System.out.printf("Test failed (expected %d != result %d) for key: %c\n",cc,idx,key);//(out)
+            }
+        }
+        final Integer[] objects = new Integer[0x100];
+        index = new Index();
+        for (int cc = 0; cc < 0x100; cc++){
+            double r = Math.random();
+            if (0.5 > r)
+                r = -r;
+            int i = (int)(r*Integer.MAX_VALUE);
+            Integer o = new Integer(i);
+            objects[cc] = o;
+            index.put(o,cc);
+        }
+        System.out.printf("%nINDEX Test Integers [Index Loading %d]%n%n",Math.round(index.load()));
+        index.distribution(false,System.err);//(err)
+        for (int cc = 0; cc < 0x100; cc++){
+            Integer key = objects[cc];
             int idx = index.get(key);
             if (idx != cc){
                 failure++;

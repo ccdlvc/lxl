@@ -94,6 +94,9 @@ public class BeanData
     public java.util.Iterator<String> iteratorKeys(){
         return this.bean.iteratorKeys();
     }
+    public lxl.Set<String> keySet(){
+        return new lxl.Set(this.bean.iteratorKeys());
+    }
     public java.util.Iterator<Object> iteratorValues(){
         return this.bean.iteratorValues();
     }
