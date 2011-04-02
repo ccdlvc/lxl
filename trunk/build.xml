@@ -151,15 +151,15 @@
     <echo>
       Test 'lxl.Index'.
     </echo>
-    <java classpath="${target.jar}" classname="lxl.Index" fork="true"/>
+    <java classpath="${target.jar}" classname="lxl.Index" fork="true" failonerror="true"/>
     <echo>
       Test 'lxl.Map'.
     </echo>
-    <java classpath="${target.jar}" classname="lxl.Map" fork="true"/>
+    <java classpath="${target.jar}" classname="lxl.Map" fork="true" failonerror="true"/>
     <echo>
       Test 'lxl.Primes'.
     </echo>
-    <java classpath="${target.jar}" classname="lxl.Primes" fork="true"/>
+    <java classpath="${target.jar}" classname="lxl.Primes" fork="true" failonerror="true"/>
     <echo>
       Test 'lxl.coder'.
     </echo>
@@ -173,7 +173,7 @@ public class A
     int fieldI;
 }
 </echo>
-    <java classpath="${coder.target.jar}" classname="lxl.coder.Main" fork="true">
+    <java classpath="${coder.target.jar}" classname="lxl.coder.Main" fork="true" failonerror="true">
       <arg value="coder/test/templates/test.Main.xtm"/>
       <arg value="coder/test/odl"/>
       <arg value="coder/test/src"/>

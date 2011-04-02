@@ -420,18 +420,17 @@ public interface Sequence<T>
          * Comparator that determines element order.
          */
         public static <T> void quickSort(Sequence<T> sequence, Comparator<T> comparator) {
-            // TODO Implement internally rather than copying to java.util.ArrayList
 
-            java.util.ArrayList<T> arrayList = new java.util.ArrayList<T>(sequence.getLength());
+            java.util.ArrayList<T> copy = new java.util.ArrayList<T>(sequence.getLength());
 
             for (int i = 0, n = sequence.getLength(); i < n; i++) {
-                arrayList.add(sequence.get(i));
+                copy.add(sequence.get(i));
             }
 
-            java.util.Collections.sort(arrayList, comparator);
+            java.util.Collections.sort(copy, comparator);
 
-            for (int i = 0, n = arrayList.size(); i < n; i++) {
-                sequence.update(i, arrayList.get(i));
+            for (int i = 0, n = copy.size(); i < n; i++) {
+                sequence.update(i, copy.get(i));
             }
         }
     }

@@ -49,6 +49,11 @@ public class Map<K extends java.lang.Comparable,V>
     }
 
 
+    public Map<K,V> reindex(){
+
+        this.index = this.index.reindex();
+        return this;
+    }
     @Override
     public Map clone(){
         Map clone = (Map)super.clone();
@@ -65,6 +70,8 @@ public class Map<K extends java.lang.Comparable,V>
         if (-1 == idx){
             idx = super.add(value);
             index.put(key,idx);
+
+            this.reindex();
         }
         else
             super.set(idx,value);
@@ -106,15 +113,17 @@ public class Map<K extends java.lang.Comparable,V>
         super.clear();
     }
     public boolean containsKey(Object key){
-        K ck = (K)key;
-        Index idx = this.index;
-        return (-1 != idx.get(ck));
+
+        return (-1 != this.index.get((K)key));
     }
     public boolean isEmpty(){
         return (0 == this.getLength());
     }
     public java.util.Iterator<K> iteratorKeys(){
         return this.index.iterator();
+    }
+    public Set<K> keySet(){
+        return this.index.keySet();
     }
     public java.util.Iterator<V> iteratorValues(){
         return super.iterator();
@@ -144,23 +153,50 @@ public class Map<K extends java.lang.Comparable,V>
 
     public final static void main(String[] test){
         final String alphabet = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        Map<Character,Integer> map = new Map<Character,Integer>(20);
+        Map<Character,Integer> mapCharacter = new Map<Character,Integer>();
         for (int cc = 0; cc < 62; cc++){
             Character key = new Character(alphabet.charAt(cc));
-            map.put(key,cc);
+            mapCharacter.put(key,cc);
         }
-        map.index.distribution(false,System.out);
+        System.out.printf("MAP Test Characters [Index Loading %d]%n%n",Math.round(mapCharacter.index.load()));
+        mapCharacter.index.distribution(false,System.err);
         int failure = 0;
         for (int cc = 0; cc < 62; cc++){
             Character key = new Character(alphabet.charAt(cc));
-            Integer idx = map.get(key);
+            Integer idx = mapCharacter.get(key);
             if (null == idx || -1 == idx){
                 failure++;
                 System.out.println("Test failed for key '"+key+"'.");
             }
         }
-        if (0 == failure)
+        Map<Integer,Integer> mapInteger = new Map<Integer,Integer>();
+        final Integer[] objects = new Integer[0x100];
+        for (int cc = 0; cc < 0x100; cc++){
+            double r = Math.random();
+            if (0.5 > r)
+                r = -r;
+            int i = (int)(r*Integer.MAX_VALUE);
+            Integer o = new Integer(i);
+            objects[cc] = o;
+            mapInteger.put(o,new Integer(cc));
+        }
+        System.out.printf("%nMAP Test Integers [Index Loading %d]%n%n",Math.round(mapInteger.index.load()));
+        mapInteger.index.distribution(false,System.err);
+        for (int cc = 0; cc < 0x100; cc++){
+            Integer key = objects[cc];
+            Integer idx = mapInteger.get(key);
+            if (idx != cc){
+                failure++;
+                System.out.printf("Test failed (expected %d != result %d) for key: %c\n",cc,idx,key);//(out)
+            }
+        }
+        if (0 == failure){
             System.out.println("Test passed.");
-        System.exit(failure);
+            System.exit(0);
+        }
+        else {
+            System.out.printf("Test failures: %d\n",failure);
+            System.exit(1);
+        }
     }
 }

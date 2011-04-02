@@ -172,8 +172,10 @@ public class ArrayList<T>
     }
     public ArrayList(ArrayList<T> list, T item) {
         super();
-        this.comparator = list.comparator;
-        this.add(item);
+        if (null != list)
+            this.comparator = list.comparator;
+        if (null != item)
+            this.add(item);
     }
     public ArrayList(T[] list) {
         super();
@@ -186,14 +188,16 @@ public class ArrayList<T>
     }
     public ArrayList(Sequence<T> sequence) {
         super();
-        int count = sequence.getLength();
-        if (0 < count){
-            T[] list = NewInstance(sequence,count);
-            for (int cc = 0; cc < count; cc++) {
-                T item = sequence.get(cc);
-                list[cc] = item;
+        if (null != sequence){
+            int count = sequence.getLength();
+            if (0 < count){
+                T[] list = NewInstance(sequence,count);
+                for (int cc = 0; cc < count; cc++) {
+                    T item = sequence.get(cc);
+                    list[cc] = item;
+                }
+                this.list = list;
             }
-            this.list = list;
         }
     }
     public ArrayList(Sequence<T> sequence, int ofs, int count) {
@@ -214,14 +218,18 @@ public class ArrayList<T>
     }
     public ArrayList(Iterable<T> list){
         super();
-        for (T item : list){
-            this.add(item);
+        if (null != list){
+            for (T item : list){
+                this.add(item);
+            }
         }
     }
     public ArrayList(ArrayList<T> copy){
         super();
-        for (T item : list){
-            this.add(item);
+        if (null != copy){
+            for (T item : copy){
+                this.add(item);
+            }
         }
     }
     public ArrayList(int initialCapacity) {
@@ -385,6 +393,11 @@ public class ArrayList<T>
         return removed;
     }
 
+    public T removeFirst(){
+
+        return this.removeIn(0);
+    }
+
     public Sequence<T> list(int index, int count) {
 
         index = Math.max(index,0);
@@ -492,6 +505,12 @@ public class ArrayList<T>
         else
             return (0 != list.length);
     }
+    public Object[] toArray() {
+        return this.toArray(null);
+    }
+    public Object[] toArraySorted() {
+        return this.toArraySorted(null);
+    }
     /**
      * Safe array is copied defensively.
      */
@@ -512,6 +531,11 @@ public class ArrayList<T>
             System.arraycopy(list,0,copy,0,len);
             return copy;
         }
+    }
+    public T[] toArraySorted(Class component){
+        T[] list = this.toArray(component);
+        java.util.Arrays.sort(list);
+        return list;
     }
     /**
      * Unsafe array is the internal list.
@@ -568,5 +592,68 @@ public class ArrayList<T>
         sb.append("]");
 
         return sb.toString();
+    }
+    public final int hashCode(){
+        int h = 0;
+        for (T item : this){
+            if (null != item){
+                h += item.hashCode();
+            }
+        }
+        return h;
+    }
+    public final boolean equals(Object that){
+        if (this == that)
+            return true;
+        else if (that instanceof Collection)
+            return this.equals( (Collection)that);
+        else
+            return false;
+    }
+    public final boolean equals(Collection that){
+        final int len = this.size();
+        if (len == that.size()){
+            final Object[] thisL = this.toArraySorted();
+            final Object[] thatL = that.toArraySorted();
+            for (int ix = 0; ix < len; ix++){
+                Object thisI = thisL[ix];
+                Object thatI = thatL[ix];
+                if (null != thisI){
+                    if (null != thatI){
+                        if (!thisI.equals(thatI))
+                            return false;
+                    }
+                    else
+                        return false;
+                }
+                else if (null != thatI)
+                    return false;
+            }
+            return true;
+        }
+        else
+            return false;
+    }
+    public final int compareTo(Collection that){
+        if (this == that)
+            return 0;
+        else {
+            int thisZ = this.size();
+            int thatZ = that.size();
+            if (thisZ == thatZ){
+                int thisH = this.hashCode();
+                int thatH = that.hashCode();
+                if (thisH == thatH)
+                    return 0;
+                else if (thisH < thatH)
+                    return -1;
+                else
+                    return 1;
+            }
+            else if (thisZ < thatZ)
+                return 1;
+            else
+                return -1;
+        }
     }
 }

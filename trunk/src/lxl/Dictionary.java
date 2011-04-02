@@ -22,36 +22,9 @@ package lxl;
  * @author gbrown
  * @author jdp
  */
-public interface Dictionary<K, V>
+public interface Dictionary<K extends Comparable, V>
     extends Cloneable
 {
-
-    public class Utils<K,V>
-        extends java.util.HashMap<K,V>
-        implements Dictionary<K,V>,
-                   Iterable<K>
-    {
-        public Utils(){
-            super();
-        }
-
-        public java.util.Iterator<K> iterator(){
-            return this.keySet().iterator();
-        }
-        public java.util.Iterator<K> iteratorKeys(){
-            return this.keySet().iterator();
-        }
-        public java.util.Iterator<V> iteratorValues(){
-            return this.values().iterator();
-        }
-        public Iterable<K> keys(){
-            return this.keySet();
-        }
-        public Dictionary<K,V> cloneDictionary(){
-            return (Dictionary<K,V>)super.clone();
-        }
-    }
-
 
     /**
      * Retrieves the value for the given key.
@@ -114,6 +87,8 @@ public interface Dictionary<K, V>
     public boolean isEmpty();
 
     public java.util.Iterator<K> iteratorKeys();
+
+    public Set<K> keySet();
 
     public java.util.Iterator<V> iteratorValues();
 

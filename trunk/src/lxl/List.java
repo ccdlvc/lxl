@@ -41,6 +41,10 @@ public interface List<T>
 
     public List<T> addAll(List<T> collection);
 
+    public T get(int index);
+
+    public T set(int index, T value);
+
     /**
      * Inserts an item into the list.
      *
@@ -86,6 +90,8 @@ public interface List<T>
      * @return The argument 
      */
     public T remove(Object t);
+
+    public T removeFirst();
 
     /**
      * @see ListListener#itemsRemoved(List, int, Sequence)
