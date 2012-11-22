@@ -41,6 +41,7 @@ import java.util.NoSuchElementException;
 public class ArrayList<T>
     extends Object
     implements List<T>,
+               Stack<T>,
                Cloneable
 {
     public final static <T> int IndexOf(T[] list, Comparator<T> c, T item) {
@@ -308,6 +309,9 @@ public class ArrayList<T>
         else
             throw new ArrayIndexOutOfBoundsException(String.valueOf(index));
     }
+    public void push(T item){
+        this.insert(item,0);
+    }
 
     public T update(int index, T newValue) {
 
@@ -398,6 +402,13 @@ public class ArrayList<T>
         return this.removeIn(0);
     }
 
+    public T pop(){
+        if (this.isNotEmpty())
+            return this.removeFirst();
+        else
+            return null;
+    }
+
     public Sequence<T> list(int index, int count) {
 
         index = Math.max(index,0);
@@ -440,6 +451,9 @@ public class ArrayList<T>
         else
             return null;
     }
+    public T peek(){
+        return this.get(0);
+    }
     public int set(T value){
         int idx = this.indexOf(value);
         if (-1 < idx)
@@ -457,6 +471,9 @@ public class ArrayList<T>
         }
         else
             throw new ArrayIndexOutOfBoundsException(String.valueOf(index));
+    }
+    public T poke(T item){
+        return this.set(0,item);
     }
     public T replace(T prev, T next){
         int idx = this.indexOf(prev);
