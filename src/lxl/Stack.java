@@ -22,7 +22,7 @@ package lxl;
  *
  * @author gbrown
  */
-public interface Stack<T> extends List<T> {
+public interface Stack<T> extends Iterable<T> {
     /**
      * "Pushes" an item onto the stack. If the stack is unsorted, the item is
      * added at the top of the stack (<tt>getLength()</tt>). Otherwise, it is
