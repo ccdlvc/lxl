@@ -28,10 +28,11 @@ public interface List<T>
     extends Sequence<T>, Collection<T>
 {
     /**
-     * Creates null list elements for a list of length greater than or
-     * equal to cap.
+     * Ensure that a following "set(index,value)" will succeed.
+     * 
+     * @param index List index
      */
-    public List<T> ensure(int cap);
+    public List<T> ensure(int index);
 
     /**
      * Adds an item to the list. If the list is unsorted, the item is appended
