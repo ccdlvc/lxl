@@ -235,9 +235,30 @@ public class ArrayList<T>
     }
     public ArrayList(int initialCapacity) {
         super();
+        this.ensure(initialCapacity);
     }
 
 
+    public List<T> ensure(int size){
+        Object[] list = this.list;
+        if (null == list){
+
+            list = new Object[size];
+
+            this.list = (T[])list;
+        }
+        else {
+            final int list_len = list.length;
+            if (size > list_len){
+
+                Object[] copier = new Object[size];
+                System.arraycopy(list,0,copier,0,list_len);
+
+                this.list = (T[])copier;
+            }
+        }
+        return this;
+    }
     public List<T> clone(){
         try {
             ArrayList<T> clone = (ArrayList<T>)super.clone();

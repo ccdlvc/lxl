@@ -22,10 +22,16 @@ import java.util.Comparator;
  * Collection interface representing an ordered sequence of items.
  *
  * @author gbrown
+ * @author jdp
  */
 public interface List<T>
     extends Sequence<T>, Collection<T>
 {
+    /**
+     * Creates null list elements for a list of length greater than or
+     * equal to cap.
+     */
+    public List<T> ensure(int cap);
 
     /**
      * Adds an item to the list. If the list is unsorted, the item is appended
