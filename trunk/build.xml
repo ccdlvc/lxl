@@ -149,6 +149,10 @@
 
   <target name="test" depends="coder" description="Run unit tests">
     <echo>
+      Test 'lxl.ArrayList.
+    </echo>
+    <java classpath="${target.jar}" classname="lxl.ArrayList" fork="true" failonerror="true"/>
+    <echo>
       Test 'lxl.Index'.
     </echo>
     <java classpath="${target.jar}" classname="lxl.Index" fork="true" failonerror="true"/>

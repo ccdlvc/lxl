@@ -235,29 +235,38 @@ public class ArrayList<T>
     }
     public ArrayList(int initialCapacity) {
         super();
-        this.ensure(initialCapacity);
+        if (0 < initialCapacity)
+            this.list = (T[])(new Object[initialCapacity]);
+        else
+            throw new IllegalArgumentException(String.valueOf(initialCapacity));
     }
 
 
-    public List<T> ensure(int size){
-        Object[] list = this.list;
-        if (null == list){
+    public List<T> ensure(int index){
+        final int size = (index+1);
+        if (0 < size){
 
-            list = new Object[size];
+            Object[] list = this.list;
+            if (null == list){
 
-            this.list = (T[])list;
-        }
-        else {
-            final int list_len = list.length;
-            if (size > list_len){
+                list = new Object[size];
 
-                Object[] copier = new Object[size];
-                System.arraycopy(list,0,copier,0,list_len);
-
-                this.list = (T[])copier;
+                this.list = (T[])list;
             }
+            else {
+                final int list_len = list.length;
+                if (size > list_len){
+
+                    Object[] copier = new Object[size];
+                    System.arraycopy(list,0,copier,0,list_len);
+
+                    this.list = (T[])copier;
+                }
+            }
+            return this;
         }
-        return this;
+        else
+            throw new IllegalArgumentException(String.valueOf(index));
     }
     public List<T> clone(){
         try {
@@ -692,6 +701,18 @@ public class ArrayList<T>
                 return 1;
             else
                 return -1;
+        }
+    }
+
+    public static void main(String[] argv){
+        try {
+            ArrayList list = new ArrayList();
+            list.ensure(1);
+            list.set(1,new Object());
+        }
+        catch (Exception exc){
+            exc.printStackTrace();
+            System.exit(1);
         }
     }
 }
