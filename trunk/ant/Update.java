@@ -309,7 +309,7 @@ public class Update
     }
     private final static File PropertyFile(String request){
         String value = PropertyEval(request);
-        if (null != value && 0 > value.indexOf(':'))
+        if (null != value)
             return new File(value);
         else
             throw new IllegalArgumentException(String.format("File not found in '%s' from '%s'",value,request));

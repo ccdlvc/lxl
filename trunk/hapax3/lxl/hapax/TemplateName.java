@@ -225,7 +225,7 @@ public final class TemplateName
 
     public final TemplateName from;
 
-    public final String source;
+    public final String source, string;
 
     public final Component path[];
 
@@ -251,6 +251,7 @@ public final class TemplateName
                 strbuf.append(el.source);
             }
             this.source = strbuf.toString();
+            this.string = source;
             this.path = path;
             this.count = count;
         }
@@ -271,10 +272,21 @@ public final class TemplateName
                 Component[] path = new Component[count];
                 System.arraycopy(shift.path,1,path,0,count);
                 this.path = path;
+                {
+                    StringBuilder strbuf = new StringBuilder();
+                    for (int cc = 0; cc < count; cc++){
+                        Component el = path[cc];
+                        if (0 != cc)
+                            strbuf.append('/');
+                        strbuf.append(el.source);
+                    }
+                    this.string = strbuf.toString();
+                }
             }
             else {
                 this.count = 0;
                 this.path = new Component[0];
+                this.string = "";
             }
         }
         else
@@ -412,10 +424,10 @@ public final class TemplateName
             return "";
     }
     public int hashCode(){
-        return this.source.hashCode();
+        return this.string.hashCode();
     }
     public String toString(){
-        return this.source;
+        return this.string;
     }
     public boolean equals(Object that){
         if (this == that)
@@ -423,7 +435,7 @@ public final class TemplateName
         else if (null == that)
             return false;
         else
-            return this.source.equals(that.toString());
+            return this.string.equals(that.toString());
     }
     public java.util.Iterator<Component> iterator(){
         return new Iterator(this.path);
