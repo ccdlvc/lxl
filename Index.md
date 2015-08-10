@@ -1,0 +1,1 @@
+> The [Index class](http://code.google.com/p/lxl/source/browse/trunk/src/lxl/Index.java) provides a light as possible static hash table.

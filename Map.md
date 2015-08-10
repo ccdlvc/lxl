@@ -1,0 +1,1 @@
+> The [Map](http://code.google.com/p/lxl/source/browse/trunk/src/lxl/Map.java) class demonstrates the use of [Index](http://code.google.com/p/lxl/source/browse/trunk/src/lxl/Index.java) over a list to create a hash array.
